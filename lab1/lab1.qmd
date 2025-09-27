@@ -1,5 +1,5 @@
 ---
-title: "Поиск IP-адреса злоумышленника11"
+title: "Поиск IP-адреса злоумышленника"
 subtitle: "lab1"
 author: "gleb.plokhikh@yandex.ru"
 format: 
