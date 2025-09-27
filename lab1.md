@@ -1,10 +1,10 @@
 ---
 author:
-- GlP
+- gleb.plokgikg@yandex.ru
 authors:
-- GlP
+- gleb.plokgikg@yandex.ru
 editor: visual
-title: lab1
+title: README
 toc-title: Table of contents
 ---
 

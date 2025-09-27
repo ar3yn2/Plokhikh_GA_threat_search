@@ -1,6 +1,6 @@
 ---
-title: "lab1"
-author: "GlP"
+title: "README"
+author: "gleb.plokgikg@yandex.ru"
 format: markdown
 editor: visual
 ---
