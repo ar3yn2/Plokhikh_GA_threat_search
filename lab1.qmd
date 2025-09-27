@@ -1,9 +1,31 @@
 ---
-title: "README"
-author: "gleb.plokgikg@yandex.ru"
-format: markdown
-editor: visual
+title: "Поиск IP-адреса злоумышленника"
+subtitle: "lab1"
+author: "gleb.plokhikh@yandex.ru"
+format: 
+  md:
+    output-file: README.md
 ---
+
+## Цель работы
+
+ Найти IP-адрес злоумышленника.
+
+## Исходные данные
+
+1. Программное обеспечение Windows 10 Pro
+2. Rstudio Desktop
+3. Интерпретатор языка R 4.1
+4. Фрагмент журнала -- файл `sample.json`
+     
+       
+ 
+## План
+
+1. Перевод файла в формате json в читабельный вид.     
+2. Анализ полученных данных.    
+3. Поиск IP-адреса злоумышленника.    
+
 
 ## Quarto
 
