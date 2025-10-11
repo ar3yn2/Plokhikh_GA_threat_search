@@ -18,26 +18,11 @@ gleb.plokhikh@yandex.ru
 2.  Анализ полученных данных.  
 3.  Поиск IP-адреса злоумышленника.
 
-## Quarto
+## Шаги:
+1. Для начала необходимо перевести файл из формата json. Для этого необходимо установить библиотеку jsonlite, позволяющую работать с json в R.
+install.packages("jsonlite")
+2. Далее необходимо импортировать данные в датафрейм df. Теперь можно посмотреть какие столбцы есть в файле.
+library(jsonlite)    
+df <- stream_in(file('sample.json'))
+colnames(df)
 
-Quarto enables you to weave together content and executable code into a
-finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that
-includes both content and the output of embedded code. You can embed
-code like this:
-
-``` r
-1 + 1
-```
-
-    [1] 2
-
-You can add options to executable code like this
-
-    [1] 4
-
-The `echo: false` option disables the printing of code (only output is
-displayed).
