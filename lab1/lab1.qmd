@@ -30,11 +30,11 @@ format:
 
 ## Шаги выполнения:   
 
-1. Установить интерпретатор R и Rstudio Desktop. 
+1\. Установить интерпретатор R и Rstudio Desktop. 
 
 ![](img/1.png)
 
-2. Установить программный пакет swirl, используя функциию R install.packages("swirl") 
+2\. Установить программный пакет swirl, используя функциию R install.packages("swirl") 
 
 ```
 install.packages("swirl") 
@@ -42,7 +42,7 @@ install.packages("swirl")
 
 ![](img/2.png)
 
-3.Запустив задание с помощью  `swirl::swirl()`, выбрать курс R Programming и пройти первые 5 подкурсов:
+3\.Запустив задание с помощью  `swirl::swirl()`, выбрать курс R Programming и пройти первые 5 подкурсов:
 
 ```  
 R version 4.5.1 (2025-06-13 ucrt) -- "Great Square Root"

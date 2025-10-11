@@ -24,14 +24,12 @@ gleb.plokhikh@yandex.ru
 
 ## Шаги выполнения:
 
-1.  Установить интерпретатор R и Rstudio Desktop.
+1\. Установить интерпретатор R и Rstudio Desktop.
 
 ![](img/1.png)
 
-1.  Установить программный пакет swirl, используя функциию R
-    install.packages(“swirl”)
-
-<!-- -->
+2\. Установить программный пакет swirl, используя функциию R
+install.packages(“swirl”)
 
     install.packages("swirl") 
 
