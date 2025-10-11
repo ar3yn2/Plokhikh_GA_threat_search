@@ -26,12 +26,16 @@ gleb.plokhikh@yandex.ru
 
 1.  Установить интерпретатор R и Rstudio Desktop.
 
-2.  Установить программный пакет swirl, используя функциию R
+![](img/1.png)
+
+1.  Установить программный пакет swirl, используя функциию R
     install.packages(“swirl”)
 
 <!-- -->
 
     install.packages("swirl") 
+
+![](img/2.png)
 
 3.Запустив задание с помощью `swirl::swirl()`, выбрать курс R
 Programming и пройти первые 5 подкурсов:
