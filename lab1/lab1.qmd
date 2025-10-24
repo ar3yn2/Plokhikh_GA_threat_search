@@ -81,11 +81,9 @@ What shall I call you? Gleb
 | The easiest way to create a vector is with the c() function, which stands for 'concatenate' or 'combine'. To
 | create a vector containing the numbers 1.1, 9, and 3.14, type c(1.1, 9, 3.14). Try it now and store the result in
 | a variable called z.
-```
-```{r}
+
 > swirl::swirl()
-```
-```
+
 | Welcome to swirl! Please sign in. If you've been here before, use the same name as you did then. If you are new,
 | call yourself something unique.
 
@@ -131,14 +129,14 @@ What shall I call you? Gleb
 
   |======                                                                                                    |   5%
 | In its simplest form, R can be used as an interactive calculator. Type 5 + 7 and press Enter.
-```
-```
+
 > 
-> 
-> 5+7
-[1] 12
+```
+```{r}
+5+7
 ```
 ```
+
 | You are really on a roll!
 
   |========                                                                                                  |   8%
