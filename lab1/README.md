@@ -1,5 +1,5 @@
 # Введение в R
-gleb.plokhikh@yandex.ru11
+gleb.plokhikh@yandex.ru
 
 ## Цель работы
 
