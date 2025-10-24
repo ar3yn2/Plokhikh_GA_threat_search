@@ -1451,14 +1451,20 @@ Programming и пройти первые 5 подкурсов:
     | Store the vector in a variable called my_char.
 
     > 
-    > my_char<-c("My", "name", "is")
+
+``` r
+my_char<-c("My", "name", "is")
+```
 
     | You are really on a roll!
 
       |==================================                        |  58%
     | Print the contents of my_char to see what it looks like.
 
-    > my_char
+``` r
+my_char
+```
+
     [1] "My"   "name" "is"  
 
     | You nailed it! Good job!
