@@ -1,5 +1,0 @@
----
-title: "Lab1"
-format: html
----
-
