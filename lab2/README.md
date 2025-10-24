@@ -23,14 +23,12 @@ gleb.plokhikh@yandex.ru
 
 ## Решение:
 
-1.  Сколько строк в датафрейме?
-
-<!-- -->
+1\. Сколько строк в датафрейме?
 
     > starwars %>% nrow()
     [1] 87
 
-1.  Сколько столбцов в датафрейме?
+2\. Сколько столбцов в датафрейме?
 
 ``` r
 library(dplyr)
@@ -53,7 +51,7 @@ starwars %>% ncol()
 
     [1] 14
 
-1.  Как просмотреть примерный вид датафрейма?
+3\. Как просмотреть примерный вид датафрейма?
 
 ``` r
 starwars %>% glimpse()
@@ -76,7 +74,7 @@ starwars %>% glimpse()
     $ vehicles   <list> <"Snowspeeder", "Imperial Speeder Bike">, <>, <>, <>, "Imp…
     $ starships  <list> <"X-wing", "Imperial shuttle">, <>, <>, "TIE Advanced x1",…
 
-1.  Сколько уникальных рас персонажей (species) представлено в данных?
+4\. Сколько уникальных рас персонажей (species) представлено в данных?
 
 ``` r
 starwars %>% distinct(species) |> knitr::kable(format='markdown')
@@ -206,7 +204,7 @@ starwars %>% distinct(species) |> knitr::kable(format='markdown')
 </tbody>
 </table>
 
-1.  Найти самого высокого персонажа.
+5\. Найти самого высокого персонажа.
 
 ``` r
 print(starwars %>% select(name, height) %>% arrange(desc(height)), n=1)
@@ -218,7 +216,7 @@ print(starwars %>% select(name, height) %>% arrange(desc(height)), n=1)
     1 Yarael Poof    264
     # ℹ 86 more rows
 
-1.  Найти всех персонажей ниже 170.
+6\. Найти всех персонажей ниже 170.
 
 ``` r
 select(starwars, name, height) %>% filter(height>170) |> knitr::kable(format='markdown')
@@ -455,7 +453,7 @@ select(starwars, name, height) %>% filter(height>170) |> knitr::kable(format='ma
 </tbody>
 </table>
 
-1.  Подсчитать ИМТ (индекс массы тела) для всех персонажей.
+7\. Подсчитать ИМТ (индекс массы тела) для всех персонажей.
 
 ``` r
 mutate(starwars, BMI=mass/((height/100)^2)) %>% select(name, height, mass, BMI) |> knitr::kable(format='markdown')
@@ -996,8 +994,8 @@ mutate(starwars, BMI=mass/((height/100)^2)) %>% select(name, height, mass, BMI) 
 </tbody>
 </table>
 
-1.  Найти 10 самых “вытянутых” персонажей. “Вытянутость” оценить по
-    отношению массы (mass) к росту (height) персонажей.
+8\. Найти 10 самых “вытянутых” персонажей. “Вытянутость” оценить по
+отношению массы (mass) к росту (height) персонажей.
 
 ``` r
 knitr::kable(format='markdown', head(mutate(starwars, my_param=mass/height) %>% arrange(my_param) %>% select(name, height, mass, my_param), n=10))
@@ -1076,8 +1074,8 @@ knitr::kable(format='markdown', head(mutate(starwars, my_param=mass/height) %>% 
 </tbody>
 </table>
 
-1.  Найти средний возраст персонажей каждой расы вселенной Звездных
-    войн.
+9\. Найти средний возраст персонажей каждой расы вселенной Звездных
+войн.
 
 ``` r
 starwars %>% group_by(species) %>% summarise(Avg_age = median(100+birth_year, na.rm = TRUE)) |> knitr::kable(format='markdown')
@@ -1246,8 +1244,8 @@ starwars %>% group_by(species) %>% summarise(Avg_age = median(100+birth_year, na
 </tbody>
 </table>
 
-1.  Найти самый распространенный цвет глаз персонажей вселенной Звездных
-    войн.
+10\. Найти самый распространенный цвет глаз персонажей вселенной
+Звездных войн.
 
 ``` r
 starwars %>% count(eye_color) %>% filter(n == max(n))
@@ -1258,8 +1256,8 @@ starwars %>% count(eye_color) %>% filter(n == max(n))
       <chr>     <int>
     1 brown        21
 
-1.  Подсчитать среднюю длину имени в каждой расе вселенной Звездных
-    войн.
+11\. Подсчитать среднюю длину имени в каждой расе вселенной Звездных
+войн.
 
 ``` r
 starwars %>% group_by(species) %>% summarise(Avg_age = median(nchar(name), na.rm = TRUE)) |> knitr::kable(format='markdown')
