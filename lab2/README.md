@@ -10,7 +10,7 @@ gleb.plokhikh@yandex.ru
     пакета dplyr – функции select(), filter(), mutate(), arrange(),
     group_by()
 
-## Исходные данные11
+## Исходные данные
 
 1.  Rstudio Desktop;
 2.  Интерпретатор языка R 4.1;
