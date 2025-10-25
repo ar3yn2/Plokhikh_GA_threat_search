@@ -1,0 +1,539 @@
+R version 4.5.1 (2025-06-13 ucrt) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64
+
+R -- это свободное ПО, и оно поставляется безо всяких гарантий.
+Вы вольны распространять его при соблюдении некоторых условий.
+Введите 'license()' для получения более подробной информации.
+
+R -- это проект, в котором сотрудничает множество разработчиков.
+Введите 'contributors()' для получения дополнительной информации и
+'citation()' для ознакомления с правилами упоминания R и его пакетов
+в публикациях.
+
+Введите 'demo()' для запуска демонстрационных программ, 'help()' -- для
+получения справки, 'help.start()' -- для доступа к справке через браузер.
+Введите 'q()', чтобы выйти из R.
+
+> 
+> 
+> 
+> options(repos = c(CRAN = "https://mirror.truenetwork.ru/CRAN/"))
+> install.packages("readr")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+устанавливаю также зависимости ‘bit’, ‘prettyunits’, ‘bit64’, ‘progress’, ‘clipr’, ‘hms’, ‘vroom’, ‘cpp11’, ‘tzdb’
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/prettyunits_1.2.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit64_4.6.0-1.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/progress_1.2.3.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/clipr_0.8.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/hms_1.1.4.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/vroom_1.6.6.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/cpp11_0.5.2.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/tzdb_0.5.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/readr_2.1.5.zip'
+Error in .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  : 
+  не могу скачать никакие файлы
+Вдобавок: Предупреждения:
+1: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/prettyunits_1.2.0.zip': Достигнуто ограничение по времени в 60 с
+2: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit64_4.6.0-1.zip': Достигнуто ограничение по времени в 60 с
+3: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/progress_1.2.3.zip': Достигнуто ограничение по времени в 60 с
+4: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/clipr_0.8.0.zip': Достигнуто ограничение по времени в 60 с
+5: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/hms_1.1.4.zip': Достигнуто ограничение по времени в 60 с
+6: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/vroom_1.6.6.zip': Достигнуто ограничение по времени в 60 с
+7: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/cpp11_0.5.2.zip': Достигнуто ограничение по времени в 60 с
+8: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/tzdb_0.5.0.zip': Достигнуто ограничение по времени в 60 с
+9: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/readr_2.1.5.zip': Достигнуто ограничение по времени в 60 с
+10: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip': Достигнуто ограничение по времени в 60 с
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘bit’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘prettyunits’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘bit64’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘progress’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘clipr’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘hms’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘vroom’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘cpp11’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘tzdb’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘readr’ не удалось
+
+> install.packages("dplyr")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/dplyr_1.1.4.zip'
+Error in .rs.downloadFile(url = urls, destfile = destfiles, method = "libcurl",  : 
+  не могу открыть URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/dplyr_1.1.4.zip'
+Вдобавок: Предупреждение:
+В .rs.downloadFile(url = urls, destfile = destfiles, method = "libcurl",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/dplyr_1.1.4.zip': Достигнуто ограничение по времени в 60 с
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘dplyr’ не удалось
+
+> install.packages("readr")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+устанавливаю также зависимости ‘bit’, ‘prettyunits’, ‘bit64’, ‘progress’, ‘clipr’, ‘hms’, ‘vroom’, ‘cpp11’, ‘tzdb’
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/prettyunits_1.2.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit64_4.6.0-1.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/progress_1.2.3.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/clipr_0.8.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/hms_1.1.4.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/vroom_1.6.6.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/cpp11_0.5.2.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/tzdb_0.5.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/readr_2.1.5.zip'
+Error in .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  : 
+  не могу скачать никакие файлы
+Вдобавок: Предупреждения:
+1: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip': состояние было 'Could not resolve hostname'
+2: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/prettyunits_1.2.0.zip': состояние было 'Could not resolve hostname'
+3: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit64_4.6.0-1.zip': состояние было 'Could not resolve hostname'
+4: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/tzdb_0.5.0.zip': состояние было 'Could not resolve hostname'
+5: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/readr_2.1.5.zip': состояние было 'Could not resolve hostname'
+6: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/progress_1.2.3.zip': состояние было 'Could not resolve hostname'
+7: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/clipr_0.8.0.zip': состояние было 'Could not resolve hostname'
+8: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/hms_1.1.4.zip': состояние было 'Could not resolve hostname'
+9: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/vroom_1.6.6.zip': состояние было 'Could not resolve hostname'
+10: В .rs.downloadFile(url = c("https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/cpp11_0.5.2.zip': состояние было 'Could not resolve hostname'
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘bit’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘prettyunits’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘bit64’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘progress’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘clipr’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘hms’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘vroom’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘cpp11’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘tzdb’ не удалось
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘readr’ не удалось
+
+> install.packages("stringr")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/stringr_1.5.2.zip'
+Error in .rs.downloadFile(url = urls, destfile = destfiles, method = "libcurl",  : 
+  не могу открыть URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/stringr_1.5.2.zip'
+Вдобавок: Предупреждение:
+В .rs.downloadFile(url = urls, destfile = destfiles, method = "libcurl",  :
+  URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/stringr_1.5.2.zip': состояние было 'Could not resolve hostname'
+Предупреждение в download.packages(pkgs, destdir = tmpd, available = available,  :
+  скачивание пакета ‘stringr’ не удалось
+
+> options(repos = c(CRAN = "https://mirror.truenetwork.ru/CRAN/"))
+> install.packages("readr")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+устанавливаю также зависимости ‘bit’, ‘prettyunits’, ‘bit64’, ‘progress’, ‘clipr’, ‘hms’, ‘vroom’, ‘cpp11’, ‘tzdb’
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit_4.6.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/prettyunits_1.2.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/bit64_4.6.0-1.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/progress_1.2.3.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/clipr_0.8.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/hms_1.1.4.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/vroom_1.6.6.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/cpp11_0.5.2.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/tzdb_0.5.0.zip'
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/readr_2.1.5.zip'
+пакет ‘bit’ успешно распакован, MD5-суммы проверены
+пакет ‘prettyunits’ успешно распакован, MD5-суммы проверены
+пакет ‘bit64’ успешно распакован, MD5-суммы проверены
+пакет ‘progress’ успешно распакован, MD5-суммы проверены
+пакет ‘clipr’ успешно распакован, MD5-суммы проверены
+пакет ‘hms’ успешно распакован, MD5-суммы проверены
+пакет ‘vroom’ успешно распакован, MD5-суммы проверены
+пакет ‘cpp11’ успешно распакован, MD5-суммы проверены
+пакет ‘tzdb’ успешно распакован, MD5-суммы проверены
+пакет ‘readr’ успешно распакован, MD5-суммы проверены
+
+Скачанные бинарные пакеты находятся в
+	C:\Users\timav\AppData\Local\Temp\RtmpcH8dnS\downloaded_packages
+> install.packages("readr")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/readr_2.1.5.zip'
+Content type 'application/zip' length 1237515 bytes (1.2 MB)
+downloaded 1.2 MB
+
+пакет ‘readr’ успешно распакован, MD5-суммы проверены
+
+Скачанные бинарные пакеты находятся в
+	C:\Users\timav\AppData\Local\Temp\RtmpcH8dnS\downloaded_packages
+> install.packages("stringr")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/stringr_1.5.2.zip'
+Content type 'application/zip' length 325091 bytes (317 KB)
+downloaded 317 KB
+
+пакет ‘stringr’ успешно распакован, MD5-суммы проверены
+
+Скачанные бинарные пакеты находятся в
+	C:\Users\timav\AppData\Local\Temp\RtmpcH8dnS\downloaded_packages
+> install.packages("httr")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/httr_1.4.7.zip'
+Content type 'application/zip' length 502090 bytes (490 KB)
+downloaded 490 KB
+
+пакет ‘httr’ успешно распакован, MD5-суммы проверены
+
+Скачанные бинарные пакеты находятся в
+	C:\Users\timav\AppData\Local\Temp\RtmpcH8dnS\downloaded_packages
+> install.packages("jsonlite")
+Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
+(потому что ‘lib’ не определено)
+пробую URL 'https://mirror.truenetwork.ru/CRAN/bin/windows/contrib/4.5/jsonlite_2.0.0.zip'
+Content type 'application/zip' length 1110647 bytes (1.1 MB)
+downloaded 1.1 MB
+
+пакет ‘jsonlite’ успешно распакован, MD5-суммы проверены
+
+Скачанные бинарные пакеты находятся в
+	C:\Users\timav\AppData\Local\Temp\RtmpcH8dnS\downloaded_packages
+> library(httr)
+> library(jsonlite)
+> library(readr)
+> library(dplyr)
+
+Присоединяю пакет: ‘dplyr’
+
+Следующие объекты скрыты от ‘package:stats’:
+
+    filter, lag
+
+Следующие объекты скрыты от ‘package:base’:
+
+    intersect, setdiff, setequal, union
+> library(jsonlite)
+> library(stringr)
+> library(knitr)
+> temp_dir <- tempdir()
+> download.file(
++     url = "https://storage.yandexcloud.net/dataset.ctfsec/dns.zip",
++     destfile = file.path(temp_dir, "dns.zip"),
++     mode = "wb"
++ )
+пробую URL 'https://storage.yandexcloud.net/dataset.ctfsec/dns.zip'
+Content type 'application/zip' length 6407934 bytes (6.1 MB)
+downloaded 6.1 MB
+
+> unzip(
++     zipfile = file.path(temp_dir, "dns.zip"),
++     exdir = temp_dir
++ )
+> log_files <- list.files(temp_dir, pattern = "\\.log$", full.names = TRUE)
+> # Вектор с названиями столбцов на основе документации Zeek
+> column_names <- c(
++     "timestamp", "uid", "source_ip", "source_port", "destination_ip", 
++     "destination_port", "protocol", "transaction_id", "query", "qclass", 
++     "qclass_name", "qtype", "qtype_name", "rcode", "rcode_name", 
++     "AA", "TC", "RD", "RA", "Z", "answers", "TTLS", "rejected"
++ )
+> dns_data <- invisible(read_delim(
++     log_files[1],
++     delim = "\t",
++     col_names = column_names,
++     comment = "#",
++     na = c("", "NA", "-"),
++     trim_ws = TRUE,
++     show_col_types = FALSE
++ )) %>% as_tibble()
+> head(dns_data,10)                                                                                                                            
+# A tibble: 10 × 23
+     timestamp uid      source_ip source_port destination_ip destination_port protocol transaction_id query qclass qclass_name qtype qtype_name
+         <dbl> <chr>    <chr>           <dbl> <chr>                     <dbl> <chr>             <dbl> <chr>  <dbl> <chr>       <dbl> <chr>     
+ 1 1331901006. CWGtK43… 192.168.…       45658 192.168.27.203              137 udp               33008 "*\\…      1 C_INTERNET     33 SRV       
+ 2 1331901015. C36a282… 192.168.…         137 192.168.202.2…              137 udp               57402 "HPE…      1 C_INTERNET     32 NB        
+ 3 1331901016. C36a282… 192.168.…         137 192.168.202.2…              137 udp               57402 "HPE…      1 C_INTERNET     32 NB        
+ 4 1331901017. C36a282… 192.168.…         137 192.168.202.2…              137 udp               57402 "HPE…      1 C_INTERNET     32 NB        
+ 5 1331901006. C36a282… 192.168.…         137 192.168.202.2…              137 udp               57398 "WPA…      1 C_INTERNET     32 NB        
+ 6 1331901007. C36a282… 192.168.…         137 192.168.202.2…              137 udp               57398 "WPA…      1 C_INTERNET     32 NB        
+ 7 1331901007. C36a282… 192.168.…         137 192.168.202.2…              137 udp               57398 "WPA…      1 C_INTERNET     32 NB        
+ 8 1331901006. ClEZCt3… 192.168.…         137 192.168.202.2…              137 udp               62187 "EWR…      1 C_INTERNET     32 NB        
+ 9 1331901007. ClEZCt3… 192.168.…         137 192.168.202.2…              137 udp               62187 "EWR…      1 C_INTERNET     32 NB        
+10 1331901008. ClEZCt3… 192.168.…         137 192.168.202.2…              137 udp               62187 "EWR…      1 C_INTERNET     32 NB        
+# ℹ 10 more variables: rcode <dbl>, rcode_name <chr>, AA <lgl>, TC <lgl>, RD <lgl>, RA <lgl>, Z <dbl>, answers <chr>, TTLS <chr>,
+#   rejected <lgl>
+> dns_data_clean <- dns_data %>%
++     mutate(
++         timestamp = as.POSIXct(timestamp, origin = "1970-01-01"),
++         source_port = as.numeric(source_port),
++         destination_port = as.numeric(destination_port),
++         transaction_id = as.numeric(transaction_id),
++         qclass = as.numeric(qclass),
++         qtype = as.numeric(qtype),
++         rcode = as.numeric(rcode),
++     ) %>% as_tibble()
+> head(dns_data_clean,10)
+# A tibble: 10 × 23
+   timestamp           uid         source_ip source_port destination_ip destination_port protocol transaction_id query qclass qclass_name qtype
+   <dttm>              <chr>       <chr>           <dbl> <chr>                     <dbl> <chr>             <dbl> <chr>  <dbl> <chr>       <dbl>
+ 1 2012-03-16 16:30:05 CWGtK431H9… 192.168.…       45658 192.168.27.203              137 udp               33008 "*\\…      1 C_INTERNET     33
+ 2 2012-03-16 16:30:15 C36a282Jlj… 192.168.…         137 192.168.202.2…              137 udp               57402 "HPE…      1 C_INTERNET     32
+ 3 2012-03-16 16:30:15 C36a282Jlj… 192.168.…         137 192.168.202.2…              137 udp               57402 "HPE…      1 C_INTERNET     32
+ 4 2012-03-16 16:30:16 C36a282Jlj… 192.168.…         137 192.168.202.2…              137 udp               57402 "HPE…      1 C_INTERNET     32
+ 5 2012-03-16 16:30:05 C36a282Jlj… 192.168.…         137 192.168.202.2…              137 udp               57398 "WPA…      1 C_INTERNET     32
+ 6 2012-03-16 16:30:06 C36a282Jlj… 192.168.…         137 192.168.202.2…              137 udp               57398 "WPA…      1 C_INTERNET     32
+ 7 2012-03-16 16:30:07 C36a282Jlj… 192.168.…         137 192.168.202.2…              137 udp               57398 "WPA…      1 C_INTERNET     32
+ 8 2012-03-16 16:30:06 ClEZCt3GLk… 192.168.…         137 192.168.202.2…              137 udp               62187 "EWR…      1 C_INTERNET     32
+ 9 2012-03-16 16:30:07 ClEZCt3GLk… 192.168.…         137 192.168.202.2…              137 udp               62187 "EWR…      1 C_INTERNET     32
+10 2012-03-16 16:30:07 ClEZCt3GLk… 192.168.…         137 192.168.202.2…              137 udp               62187 "EWR…      1 C_INTERNET     32
+# ℹ 11 more variables: qtype_name <chr>, rcode <dbl>, rcode_name <chr>, AA <lgl>, TC <lgl>, RD <lgl>, RA <lgl>, Z <dbl>, answers <chr>,
+#   TTLS <chr>, rejected <lgl>
+> unique_source_ips <- unique(dns_data_clean$source_ip)
+> unique_destination_ips <- unique(dns_data_clean$destination_ip)
+> all_ips<-unique(c(unique_source_ips, unique_destination_ips))
+> length(all_ips)
+[1] 1359
+> internal_ips <- all_ips[grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", all_ips)]
+> external_ips <- all_ips[!grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", all_ips)]
+> length(internal_ips) / length(external_ips)
+[1] 13.77174
+> dns_data_clean%>%
++     group_by(source_ip)%>%
++     count(sort = TRUE) %>%
++     as_tibble() %>%
++     head(10)
+# A tibble: 10 × 2
+   source_ip           n
+   <chr>           <int>
+ 1 10.10.117.210   75943
+ 2 192.168.202.93  26522
+ 3 192.168.202.103 18121
+ 4 192.168.202.76  16978
+ 5 192.168.202.97  16176
+ 6 192.168.202.141 14967
+ 7 10.10.117.209   14222
+ 8 192.168.202.110 13372
+ 9 192.168.203.63  12148
+10 192.168.202.106 10784
+> top_10_domains <- dns_data_clean%>%count(query, sort = TRUE) %>%
++     as_tibble() %>% head(10)
+> top_10_domains
+# A tibble: 10 × 2
+   query                                                                         n
+   <chr>                                                                     <int>
+ 1 "teredo.ipv6.microsoft.com"                                               39273
+ 2 "tools.google.com"                                                        14057
+ 3 "www.apple.com"                                                           13390
+ 4 "time.apple.com"                                                          13109
+ 5 "safebrowsing.clients.google.com"                                         11658
+ 6 "*\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" 10401
+ 7 "WPAD"                                                                     9134
+ 8 "44.206.168.192.in-addr.arpa"                                              7248
+ 9 "HPE8AA67"                                                                 6929
+10 "ISATAP"                                                                   6569
+> top_domains_data <- dns_data_clean[dns_data_clean$query %in% top_10_domains$query, ]
+> top_domains_data <- top_domains_data[order(top_domains_data$query, top_domains_data$timestamp), ]
+> results <- data.frame(
++     Domain = character(),
++     Min = numeric(),
++     Q1 = numeric(),
++     Median = numeric(),
++     Mean = numeric(),
++     Q3 = numeric(),
++     Max = numeric()
++ )
+> for(domain in top_10_domains$query) {
++     domain_data <- top_domains_data[top_domains_data$query == domain, ]
++     domain_data <- domain_data[!is.na(domain_data$timestamp), ]
++     
++     if(nrow(domain_data) > 1) {
++         time_diffs <- diff(as.numeric(domain_data$timestamp))
++         domain_stats <- summary(time_diffs)
++         results <- rbind(results, data.frame(
++             Domain = domain,
++             Min = as.numeric(domain_stats["Min."]),
++             Q1 = as.numeric(domain_stats["1st Qu."]),
++             Median = as.numeric(domain_stats["Median"]),
++             Mean = as.numeric(domain_stats["Mean"]),
++             Q3 = as.numeric(domain_stats["3rd Qu."]),
++             Max = as.numeric(domain_stats["Max."])
++         ))
++     }
++ }
+> results
+                                                                    Domain Min        Q1   Median      Mean      Q3      Max
+1                                                teredo.ipv6.microsoft.com   0 0.0000000 0.000000  2.941409  0.5100 50387.76
+2                                                         tools.google.com   0 0.0000000 0.000000  8.187012  1.0000 50364.83
+3                                                            www.apple.com   0 0.0000000 1.000000  8.607446  3.0100 50963.63
+4                                                           time.apple.com   0 0.3699999 1.760000  8.665050  4.7225 50924.28
+5                                          safebrowsing.clients.google.com   0 0.0000000 1.000000 10.003054  2.0100 49952.32
+6  *\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00   0 0.1499999 0.500000 11.244317  1.5000 52723.50
+7                                                                     WPAD   0 0.7500000 0.750000 12.608225  1.1100 50049.11
+8                                              44.206.168.192.in-addr.arpa   0 2.0899999 4.000000 16.006259 20.0900 49679.81
+9                                                                 HPE8AA67   0 0.7500000 0.750000 16.608906 25.4900 50044.43
+10                                                                  ISATAP   0 0.7500000 0.759999 17.463671  1.0500 51997.79
+> top_domains <- top_10_domains$query
+> periodic_analysis <- data.frame(
++     source_ip = character(),
++     domain = character(),
++     request_count = integer(),
++     avg_interval = numeric(),
++     std_dev = numeric(),
++     is_periodic = logical()
++ )
+> for(domain in top_domains) {
++     domain_data <- dns_data_clean[dns_data_clean$query == domain, ]
++     domain_data <- domain_data[!is.na(domain_data$timestamp), ]
++     unique_ips <- unique(domain_data$source_ip)
++     for(ip in unique_ips) {
++         ip_data <- domain_data[domain_data$source_ip == ip, ]
++         if(nrow(ip_data) >= 5) {
++             ip_data <- ip_data[order(ip_data$timestamp), ]
++             timestamps <- as.numeric(ip_data$timestamp)
++             intervals <- diff(timestamps)
++             avg_interval <- mean(intervals)
++             std_dev <- sd(intervals)
++             # Критерий периодичности: низкое стандартное отклонение относительно среднего
++             is_periodic <- std_dev < avg_interval * 0.5
++             periodic_analysis <- rbind(periodic_analysis, data.frame(
++                 source_ip = ip,
++                 domain = domain,
++                 request_count = nrow(ip_data),
++                 avg_interval = avg_interval,
++                 std_dev = std_dev,
++                 is_periodic = is_periodic
++             ))
++         }
++     }
++ }
+> suspicious_ips <- periodic_analysis[periodic_analysis$is_periodic == TRUE, ] %>%
++     as_tibble()
+> suspicious_ips
+# A tibble: 9 × 6
+  source_ip       domain                                                                    request_count avg_interval std_dev is_periodic
+  <chr>           <chr>                                                                             <int>        <dbl>   <dbl> <lgl>      
+1 192.168.25.25   "safebrowsing.clients.google.com"                                                     8       16.2   0.520   TRUE       
+2 192.168.24.25   "safebrowsing.clients.google.com"                                                     8       16.2   0.165   TRUE       
+3 192.168.21.25   "safebrowsing.clients.google.com"                                                     7       14.3   4.60    TRUE       
+4 192.168.25.25   "*\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"             9        1.51  0.00641 TRUE       
+5 192.168.202.120 "WPAD"                                                                               14        0.656 0.296   TRUE       
+6 192.168.202.49  "ISATAP"                                                                             90        0.767 0.121   TRUE       
+7 192.168.0.3     "ISATAP"                                                                            108        0.874 0.313   TRUE       
+8 192.168.202.146 "ISATAP"                                                                              6        0.754 0.0270  TRUE       
+9 192.168.202.147 "ISATAP"                                                                             33        0.862 0.147   TRUE       
+> top_domains <- top_10_domains$query
+> domain_ip_mapping <- data.frame(
++     domain = character(),
++     ip_address = character()
++ )
+> for (domain in top_domains) {
++     domain_data <- dns_data_clean[dns_data_clean$query == domain, ]
++     if (nrow(domain_data) > 0) {
++         ip <- domain_data$destination_ip[1]
++         domain_ip_mapping <- rbind(domain_ip_mapping, data.frame(
++             domain = domain,
++             ip_address = ip
++         ))
++     }
++ }
+> domain_geo_info <- data.frame(
++     domain = character(),
++     ip_address = character(),
++     country = character(),
++     city = character(),
++     isp = character(),
++     stringsAsFactors = FALSE
++ )
+> for (i in 1:nrow(domain_ip_mapping)) {
++     domain <- domain_ip_mapping$domain[i]
++     ip <- domain_ip_mapping$ip_address[i]
++     if (grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", ip)) {
++         domain_geo_info <- rbind(domain_geo_info, data.frame(
++             domain = domain,
++             ip_address = ip,
++             country = "Частный IP",
++             city = "Частный IP",
++             isp = "Частный IP"
++         ))
++         next
++     }
++     url <- paste0("http://ip-api.com/json/", ip)
++     response <- GET(url)
++     if (status_code(response) == 200) {
++         data <- fromJSON(content(response, "text"))
++         if (data$status == "success") {
++             domain_geo_info <- rbind(domain_geo_info, data.frame(
++                 domain = domain,
++                 ip_address = ip,
++                 country = data$country,
++                 city = data$city,
++                 isp = data$isp
++             ))%>% as_tibble()
++         } else {
++             domain_geo_info <- rbind(domain_geo_info, data.frame(
++                 domain = domain,
++                 ip_address = ip,
++                 country = "Не определено",
++                 city = "Не определено",
++                 isp = "Не определено"
++             ))%>% as_tibble()
++         }
++     } else {
++         domain_geo_info <- rbind(domain_geo_info, data.frame(
++             domain = domain,
++             ip_address = ip,
++             country = "Ошибка API",
++             city = "Ошибка API",
++             isp = "Ошибка API"
++         )) %>% as_tibble()
++     }
++     Sys.sleep(1)
++ }
+> domain_geo_info
+# A tibble: 10 × 5
+   domain                                                                    ip_address      country       city          isp          
+   <chr>                                                                     <chr>           <chr>         <chr>         <chr>        
+ 1 "teredo.ipv6.microsoft.com"                                               NA              Не определено Не определено Не определено
+ 2 "tools.google.com"                                                        NA              Не определено Не определено Не определено
+ 3 "www.apple.com"                                                           172.19.1.100    Частный IP    Частный IP    Частный IP   
+ 4 "time.apple.com"                                                          NA              Не определено Не определено Не определено
+ 5 "safebrowsing.clients.google.com"                                         NA              Не определено Не определено Не определено
+ 6 "*\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" 192.168.27.203  Частный IP    Частный IP    Частный IP   
+ 7 "WPAD"                                                                    192.168.202.255 Частный IP    Частный IP    Частный IP   
+ 8 "44.206.168.192.in-addr.arpa"                                             NA              Не определено Не определено Не определено
+ 9 "HPE8AA67"                                                                192.168.202.255 Частный IP    Частный IP    Частный IP   
+10 "ISATAP"                                                                  NA              Не определено Не определено Не определено
+> 
