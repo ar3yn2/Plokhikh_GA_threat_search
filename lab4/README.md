@@ -68,7 +68,7 @@ install.packages("readr")
 
 
     Скачанные бинарные пакеты находятся в
-        C:\Users\timav\AppData\Local\Temp\RtmpIBjOud\downloaded_packages
+        C:\Users\timav\AppData\Local\Temp\RtmpOw30ti\downloaded_packages
 
 ``` r
 install.packages("dplyr")
@@ -90,7 +90,7 @@ install.packages("dplyr")
 
 
     Скачанные бинарные пакеты находятся в
-        C:\Users\timav\AppData\Local\Temp\RtmpIBjOud\downloaded_packages
+        C:\Users\timav\AppData\Local\Temp\RtmpOw30ti\downloaded_packages
 
 ``` r
 install.packages("stringr")
@@ -102,7 +102,7 @@ install.packages("stringr")
     пакет 'stringr' успешно распакован, MD5-суммы проверены
 
     Скачанные бинарные пакеты находятся в
-        C:\Users\timav\AppData\Local\Temp\RtmpIBjOud\downloaded_packages
+        C:\Users\timav\AppData\Local\Temp\RtmpOw30ti\downloaded_packages
 
 ``` r
 install.packages("httr")
@@ -114,7 +114,7 @@ install.packages("httr")
     пакет 'httr' успешно распакован, MD5-суммы проверены
 
     Скачанные бинарные пакеты находятся в
-        C:\Users\timav\AppData\Local\Temp\RtmpIBjOud\downloaded_packages
+        C:\Users\timav\AppData\Local\Temp\RtmpOw30ti\downloaded_packages
 
 ``` r
 install.packages("jsonlite")
@@ -137,7 +137,7 @@ install.packages("jsonlite")
 
 
     Скачанные бинарные пакеты находятся в
-        C:\Users\timav\AppData\Local\Temp\RtmpIBjOud\downloaded_packages
+        C:\Users\timav\AppData\Local\Temp\RtmpOw30ti\downloaded_packages
 
 ``` r
 library(httr)
@@ -524,7 +524,7 @@ domain_geo_info
 ## Оценка результата
 
 В рамках практческой работы была исследована подозрительная сетевая
-активность во внутренней сети Доброй Организации. Были восстановлены
+активность во внутренней сети организации. Были восстановлены
 недостающие метаданные и подготовлены ответы на вопросы.
 
 ## Вывод
