@@ -1,0 +1,160 @@
+---
+title: "Исследование вредоносной активности в домене Windows"
+author: "gleb.plokhikh@yandex.ru"
+format: 
+  md:
+    output-file: README.md
+---
+
+## Цель работы
+
+  1. Закрепить навыки исследования данных журнала Windows Active Directory
+  2. Изучить структуру журнала системы Windows Active Directory
+  3. Закрепить практические навыки использования языка программирования R для
+обработки данных
+  4. Закрепить знания основных функций обработки данных экосистемы tidyverse
+языка R
+
+
+
+## Исходные данные
+
+1. Программное обеспечение Windows 11 Pro
+2. Rstudio Desktop
+3. Интерпретатор языка R 4.5.1
+4. Программный пакет dplyr
+5. Данные журнала Windows Active Directory
+       
+ 
+## План
+
+1. Подготовка данных для анализа 
+2. Анализ датасета
+3. Оформление отчета
+
+
+## Шаги:
+
+### Подготовка данных
+
+1.Импортируйте данные в R. Это можно выполнить с помощью jsonlite::stream_in(file()) . Датасет находится по адресу https://storage.yandexcloud.net/iamcth-data/dataset.tar.gz.
+```{r}
+library(jsonlite)
+library(xml2)
+library(rvest)
+library(dplyr)
+library(tidyr)
+library(purrr)
+
+src_url <- "https://storage.yandexcloud.net/iamcth-data/dataset.tar.gz"
+tmp_tar <- "ad_logs.tar.gz"
+
+download.file(src_url, tmp_tar, mode = "wb", quiet = TRUE)
+
+tar_contents <- untar(tmp_tar, list = TRUE)
+json_path <- tar_contents[grep("\\.json$", tar_contents)]
+
+tmp_dir <- tempdir()
+untar(tmp_tar, files = json_path, exdir = tmp_dir)
+
+full_json <- file.path(tmp_dir, json_path)
+
+json_conn <- file(full_json, open = "r")
+logs_raw <- stream_in(json_conn)
+cat("Импортировано строк:", nrow(logs_raw), "\n")
+
+events_url <- "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor"
+html_doc <- read_html(events_url)
+event_ref <- html_table(html_doc, fill = TRUE)[[1]]
+```
+
+2.Привести датасеты в вид “аккуратных данных”, преобразовать типы столбцов в соответствии с типом данных.
+```{r}
+logs_prepared <- logs_raw %>%
+  mutate(
+    time = as.POSIXct(`@timestamp`, format = "%Y-%m-%dT%H:%M:%OSZ"),
+    across(where(is.character), ~ifelse(. == "", NA, .))
+  )
+
+cat("Строк:", nrow(logs_prepared), "Колонок:", ncol(logs_prepared), "\n")
+```
+
+3.Просмотрите общую структуру данных с помощью функции glimpse()
+```{r}
+glimpse(logs_prepared)
+glimpse(event_ref)
+```
+
+
+### Анализ данных
+
+1.Раскройте датафрейм избавившись от вложенных датафреймов. Для обнаружения таких можно использовать функцию dplyr::glimpse() , а для раскрытия вложенности – tidyr::unnest() . Обратите внимание, что при раскрытии теряются внешние названия колонок – это можно предотвратить если использовать параметр tidyr::unnest(..., names_sep = ) .
+```{r}
+nested_cols <- names(logs_prepared)[map_lgl(logs_prepared, is.data.frame)]
+
+for (cl in nested_cols) {
+  logs_prepared <- unnest(logs_prepared, all_of(cl), names_sep = "_")
+}
+```
+
+2.Минимизируйте количество колонок в датафрейме – уберите колоки с единственным значением параметра.
+```{r}
+drop_cols <- c()
+
+for (nm in names(logs_prepared)) {
+  x <- logs_prepared[[nm]]
+  if (!is.list(x) && !is.data.frame(x)) {
+    uniq <- unique(na.omit(x[seq_len(min(1000, length(x)))]))
+    if (length(uniq) <= 1) drop_cols <- c(drop_cols, nm)
+  }
+}
+
+logs_prepared <- select(logs_prepared, -any_of(drop_cols))
+
+cat("Убрано колонок:", length(drop_cols), "\n")
+cat("Осталось:", ncol(logs_prepared), "\n")
+```
+
+3.Какое количество хостов представлено в данном датасете?
+```{r}
+host_total <- logs_prepared %>%
+  distinct(winlog_computer_name) %>%
+  nrow()
+
+cat("Хостов в логе:", host_total, "\n")
+```
+
+4.Подготовьте датафрейм с расшифровкой Windows Event_ID, приведите типы данных к типу их значений.
+```{r}
+
+events_clean <- event_ref %>%
+  rename(
+    winlog_event_id = `Current Windows Event ID`,
+    event_desc = `Event Summary`
+  ) %>%
+  mutate(
+    winlog_event_id = as.integer(winlog_event_id),
+    event_desc = as.character(event_desc)
+  )
+
+glimpse(events_clean)
+```
+
+5.Есть ли в логе события с высоким и средним уровнем значимости? Сколько их?
+```{r}
+sev_high <- logs_prepared %>% filter(log_level == "error")
+sev_mid  <- logs_prepared %>% filter(log_level == "warning")
+
+cat("Высокий уровень:", nrow(sev_high), "\n")
+cat("Средний уровень:", nrow(sev_mid), "\n")
+cat("Итого:", nrow(sev_high) + nrow(sev_mid), "\n")
+```
+
+## Оценка результата
+
+  В результате лабораторной работы мы закрепили навыки исследования данных журнала Windows Active Directory, изучили структуру журнала системы Windows Active Directory, закрепили практические навыки использования языка программирования R для
+обработки данных и знания основных функций обработки данных экосистемы tidyverse.
+
+## Вывод
+
+  Таким образом, Используя программный пакет dplyr мы исследовали вредоносную активность в домене Windows и научились анализировать данные журнала Windows.
