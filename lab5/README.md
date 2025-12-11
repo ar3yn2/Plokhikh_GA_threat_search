@@ -78,7 +78,7 @@ library(curl)
 
         parse_date
 
-1.  Загрузка данных Составление текстов
+1.  Загрузка данных
 
 ``` r
 dataset_url <- "https://storage.yandexcloud.net/dataset.ctfsec/P2_wifi_data.csv"
@@ -104,7 +104,7 @@ raw_data <- read_csv(tmp_file, skip = 1, col_names = FALSE)
 divider <- which(raw_data$X1 == "Station MAC")
 ```
 
-1.  Создание таблиц AP и клиентов Составление текстов
+1.  Создание таблиц AP и клиентов
 
 ``` r
 ap_raw <- raw_data[2:(divider[1]-1), ]
@@ -118,7 +118,7 @@ names(ap_raw) <- ap_cols[1:ncol(ap_raw)]
 names(clients_raw) <- client_cols[1:ncol(clients_raw)]
 ```
 
-1.  Преобразование типов и очистка Составление текстов
+1.  Преобразование типов и очистка
 
 ``` r
 wifi_ap <- ap_raw %>%
@@ -144,7 +144,7 @@ wifi_clients <- clients_raw[-1, ] %>%
   )
 ```
 
-1.  Просмотр структуры данных Составление текстов
+1.  Просмотр структуры данных
 
 ``` r
 glimpse(wifi_ap)
@@ -182,8 +182,7 @@ glimpse(wifi_clients)
     $ assoc_bssid <chr> "BE:F1:71:D5:17:8B", "(not associated)", "BE:F1:71:D6:10:D…
     $ probe       <chr> "C322U13 3965", "IT2 Wireless", "C322U21 0566", "C322U13 3…
 
-Анализ точек доступа 1. Определение небезопасных точек OPN Составление
-текстов
+##Анализ точек доступа 1. Определение небезопасных точек OPN
 
 ``` r
 open_ap <- wifi_ap %>%
@@ -215,7 +214,7 @@ cat("Процент от всех:", round(100*nrow(open_ap)/nrow(wifi_ap),1), "
     Всего небезопасных точек: 23 
     Процент от всех: 24 %
 
-1.  Производители AP Составление текстов
+1.  Производители AP
 
 ``` r
 extract_oui <- function(mac){ ifelse(!is.na(mac)&mac!="", str_replace_all(substr(mac,1,8),":","-"), NA_character_) }
@@ -251,7 +250,7 @@ cat("Уникальных производителей:", n_distinct(ap_vendor$v
 
     Уникальных производителей: 64 
 
-1.  Точки с WPA3 Составление текстов
+1.  Точки с WPA3
 
 ``` r
 wpa3_ap <- wifi_ap %>%
@@ -277,7 +276,7 @@ cat("Всего WPA3 AP:", nrow(wpa3_ap), "\n")
     5 A2:FE:FF:B8:9B:C9 "Christie’s"                     WPA3 W… SAE … CCMP      -70
     Всего WPA3 AP: 5 
 
-1.  Длительность сессий AP Составление текстов
+1.  Длительность сессий AP
 
 ``` r
 ap_sessions <- wifi_ap %>%
@@ -317,7 +316,7 @@ cat("Максимальная длительность:", round(max(ap_sessions$
 
     Максимальная длительность: 9776 мин
 
-1.  Топ-10 по скорости Составление текстов
+1.  Топ-10 по скорости
 
 ``` r
 fast_ap <- wifi_ap %>%
@@ -349,7 +348,7 @@ cat("Максимальная скорость:", max(fast_ap$speed), "Mbps\n")
 
     Максимальная скорость: 866 Mbps
 
-1.  Beacon-трафик Составление текстов
+1.  Beacon-трафик
 
 ``` r
 beacon_stats <- wifi_ap %>%
@@ -382,7 +381,7 @@ cat("Максимальная частота beacon:", round(max(beacon_stats$ra
 
     Максимальная частота beacon: 0.9 в час
 
-Анализ клиентов 1. Производители клиентов Составление текстов
+##Анализ клиентов 1. Производители клиентов
 
 ``` r
 client_vendor <- wifi_clients %>%
@@ -413,7 +412,7 @@ cat("Уникальных производителей клиентов:", n_dis
 
     Уникальных производителей клиентов: 11792 
 
-1.  Нерандомизированные MAC Составление текстов
+1.  Нерандомизированные MAC
 
 ``` r
 clients_nonrnd <- wifi_clients %>%
@@ -452,7 +451,7 @@ cat("Процент:", round(100*nrow(clients_nonrnd)/nrow(wifi_clients),1), "%\
 
     Процент: 1.8 %
 
-1.  Кластеризация probe-запросов Составление текстов
+1.  Кластеризация probe-запросов
 
 ``` r
 probe_stats <- wifi_clients %>%
@@ -485,7 +484,7 @@ probe_stats
     # ℹ 1,467 more rows
     # ℹ 1 more variable: last_seen <dttm>
 
-1.  Стабильность сигнала Составление текстов
+1.  Стабильность сигнала
 
 ``` r
 probe_stats <- probe_stats %>%
@@ -504,7 +503,7 @@ top_cluster
     1 00:90:4C:E6:54:54 Redmi         -65        NA     1 2023-07-28 09:16:59
     # ℹ 2 more variables: last_seen <dttm>, stability_score <dbl>
 
-Оценка результата \## Оценка результата
+## Оценка результата
 
 В результате лабораторной работы мы получили знания о методах
 исследования радиоэлектронной обстановки, составили представление о
