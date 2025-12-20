@@ -1,4 +1,4 @@
-# Исследование вредоносной активности в домене Windows
+# 6 Практика
 gleb.plokhikh@yandex.ru
 
 ## Цель работы
@@ -17,7 +17,6 @@ gleb.plokhikh@yandex.ru
 2.  Rstudio Desktop
 3.  Интерпретатор языка R 4.5.1
 4.  Программный пакет dplyr
-5.  Данные журнала Windows Active Directory
 
 ## План
 
@@ -29,9 +28,7 @@ gleb.plokhikh@yandex.ru
 
 ### Подготовка данных
 
-1.Импортируйте данные в R. Это можно выполнить с помощью
-jsonlite::stream_in(file()) . Датасет находится по адресу
-https://storage.yandexcloud.net/iamcth-data/dataset.tar.gz.
+1.Импортируйте данных
 
 ``` r
 library(jsonlite)
@@ -301,10 +298,10 @@ logs_raw <- stream_in(json_conn)
      Imported 101904 records. Simplifying...
 
 ``` r
-cat("Импортировано строк:", nrow(logs_raw), "\n")
+cat("Строк импортировано:", nrow(logs_raw), "\n")
 ```
 
-    Импортировано строк: 101904 
+    Строк импортировано: 101904 
 
 ``` r
 events_url <- "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor"
@@ -312,15 +309,14 @@ html_doc <- read_html(events_url)
 event_ref <- html_table(html_doc, fill = TRUE)[[1]]
 ```
 
-2.Привести датасеты в вид “аккуратных данных”, преобразовать типы
-столбцов в соответствии с типом данных.
+2.Приведение данных к “аккуратной” форме:
 
 ``` r
 logs_prepared <- logs_raw %>%
-  mutate(
-    time = as.POSIXct(`@timestamp`, format = "%Y-%m-%dT%H:%M:%OSZ"),
-    across(where(is.character), ~ifelse(. == "", NA, .))
-  )
+mutate(
+time = as.POSIXct(`@timestamp`, format = "%Y-%m-%dT%H:%M:%OSZ"),
+across(where(is.character), ~ifelse(. == "", NA, .))
+)
 
 cat("Строк:", nrow(logs_prepared), "Колонок:", ncol(logs_prepared), "\n")
 ```
@@ -359,72 +355,66 @@ glimpse(event_ref)
 
 ### Анализ данных
 
-1.Раскройте датафрейм избавившись от вложенных датафреймов. Для
-обнаружения таких можно использовать функцию dplyr::glimpse() , а для
-раскрытия вложенности – tidyr::unnest() . Обратите внимание, что при
-раскрытии теряются внешние названия колонок – это можно предотвратить
-если использовать параметр tidyr::unnest(…, names_sep = ) .
+1.Разворачивание вложенных датафреймов:
 
 ``` r
 nested_cols <- names(logs_prepared)[map_lgl(logs_prepared, is.data.frame)]
 
 for (cl in nested_cols) {
-  logs_prepared <- unnest(logs_prepared, all_of(cl), names_sep = "_")
+logs_prepared <- unnest(logs_prepared, all_of(cl), names_sep = "_")
 }
 ```
 
-2.Минимизируйте количество колонок в датафрейме – уберите колоки с
-единственным значением параметра.
+2.Удаление колонок с единичными значениями:
 
 ``` r
 drop_cols <- c()
 
 for (nm in names(logs_prepared)) {
-  x <- logs_prepared[[nm]]
-  if (!is.list(x) && !is.data.frame(x)) {
-    uniq <- unique(na.omit(x[seq_len(min(1000, length(x)))]))
-    if (length(uniq) <= 1) drop_cols <- c(drop_cols, nm)
-  }
+x <- logs_prepared[[nm]]
+if (!is.list(x) && !is.data.frame(x)) {
+uniq <- unique(na.omit(x[seq_len(min(1000, length(x)))]))
+if (length(uniq) <= 1) drop_cols <- c(drop_cols, nm)
+}
 }
 
 logs_prepared <- select(logs_prepared, -any_of(drop_cols))
 
-cat("Убрано колонок:", length(drop_cols), "\n")
+cat("Колонок удалено:", length(drop_cols), "\n")
 ```
 
-    Убрано колонок: 13 
+    Колонок удалено: 13 
 
 ``` r
-cat("Осталось:", ncol(logs_prepared), "\n")
+cat("Осталось колонок:", ncol(logs_prepared), "\n")
 ```
 
-    Осталось: 22 
+    Осталось колонок: 22 
 
-3.Какое количество хостов представлено в данном датасете?
+3.Подсчет количества уникальных хостов:
 
 ``` r
 host_total <- logs_prepared %>%
-  distinct(winlog_computer_name) %>%
-  nrow()
+distinct(winlog_computer_name) %>%
+nrow()
 
-cat("Хостов в логе:", host_total, "\n")
+cat("Уникальных хостов:", host_total, "\n")
 ```
 
-    Хостов в логе: 5 
+    Уникальных хостов: 5 
 
-4.Подготовьте датафрейм с расшифровкой Windows Event_ID, приведите типы
-данных к типу их значений.
+4.Подготовка справочника Windows Event_ID:
 
 ``` r
 events_clean <- event_ref %>%
-  rename(
-    winlog_event_id = `Current Windows Event ID`,
-    event_desc = `Event Summary`
-  ) %>%
-  mutate(
-    winlog_event_id = as.integer(winlog_event_id),
-    event_desc = as.character(event_desc)
-  )
+rename(
+winlog_event_id = `Current Windows Event ID`,
+event_desc = `Event Summary`
+) %>%
+mutate(
+winlog_event_id = as.integer(winlog_event_id),
+event_desc = as.character(event_desc)
+)
 ```
 
     Warning: There was 1 warning in `mutate()`.
@@ -443,40 +433,37 @@ glimpse(events_clean)
     $ `Potential Criticality`   <chr> "High", "High", "High", "High", "High", "Hig…
     $ event_desc                <chr> "A monitored security event pattern has occu…
 
-5.Есть ли в логе события с высоким и средним уровнем значимости? Сколько
-их?
+5.Определение событий с высоким и средним уровнем важности:
 
 ``` r
 sev_high <- logs_prepared %>% filter(log_level == "error")
-sev_mid  <- logs_prepared %>% filter(log_level == "warning")
+sev_mid <- logs_prepared %>% filter(log_level == "warning")
 
-cat("Высокий уровень:", nrow(sev_high), "\n")
+cat("События высокого уровня:", nrow(sev_high), "\n")
 ```
 
-    Высокий уровень: 4 
+    События высокого уровня: 4 
 
 ``` r
-cat("Средний уровень:", nrow(sev_mid), "\n")
+cat("События среднего уровня:", nrow(sev_mid), "\n")
 ```
 
-    Средний уровень: 222 
+    События среднего уровня: 222 
 
 ``` r
-cat("Итого:", nrow(sev_high) + nrow(sev_mid), "\n")
+cat("Всего:", nrow(sev_high) + nrow(sev_mid), "\n")
 ```
 
-    Итого: 226 
+    Всего: 226 
 
-## Оценка результата
+## Результат
 
-В результате лабораторной работы мы закрепили навыки исследования данных
-журнала Windows Active Directory, изучили структуру журнала системы
-Windows Active Directory, закрепили практические навыки использования
-языка программирования R для обработки данных и знания основных функций
-обработки данных экосистемы tidyverse.
+В ходе работы мы изучили структуру логов Windows AD, освоили методы их
+анализа с помощью R, а также закрепили навыки использования tidyverse
+для обработки данных.
 
 ## Вывод
 
-Таким образом, Используя программный пакет dplyr мы исследовали
-вредоносную активность в домене Windows и научились анализировать данные
-журнала Windows.
+Используя пакет dplyr, удалось провести анализ активности в домене
+Windows, выявить события с разной степенью важности и научиться работать
+с журналами системы.
