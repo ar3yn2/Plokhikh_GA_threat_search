@@ -25,11 +25,6 @@ gleb.plokhikh@yandex.ru
 
 1\. Сколько строк в датафрейме?
 
-    > starwars %>% nrow()
-    [1] 87
-
-2\. Сколько столбцов в датафрейме?
-
 ``` r
 library(dplyr)
 ```
@@ -46,15 +41,41 @@ library(dplyr)
         intersect, setdiff, setequal, union
 
 ``` r
-starwars %>% ncol()
+library(knitr)
+data("starwars")
+starwars |> nrow()
 ```
 
-    [1] 14
+    [1] 87
+
+2\. Размер датафрейма?
+
+``` r
+data.frame(
+  rows = nrow(starwars),
+  cols = ncol(starwars)
+) |> knitr::kable()
+```
+
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">rows</th>
+<th style="text-align: right;">cols</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">14</td>
+</tr>
+</tbody>
+</table>
 
 3\. Как просмотреть примерный вид датафрейма?
 
 ``` r
-starwars %>% glimpse()
+glimpse(starwars)
 ```
 
     Rows: 87
@@ -77,129 +98,18 @@ starwars %>% glimpse()
 4\. Сколько уникальных рас персонажей (species) представлено в данных?
 
 ``` r
-starwars %>% distinct(species) |> knitr::kable(format='markdown')
+starwars |> distinct(species) |> count() |> knitr::kable()
 ```
 
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">species</th>
+<th style="text-align: right;">n</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;">Human</td>
-</tr>
-<tr>
-<td style="text-align: left;">Droid</td>
-</tr>
-<tr>
-<td style="text-align: left;">Wookiee</td>
-</tr>
-<tr>
-<td style="text-align: left;">Rodian</td>
-</tr>
-<tr>
-<td style="text-align: left;">Hutt</td>
-</tr>
-<tr>
-<td style="text-align: left;">NA</td>
-</tr>
-<tr>
-<td style="text-align: left;">Yoda’s species</td>
-</tr>
-<tr>
-<td style="text-align: left;">Trandoshan</td>
-</tr>
-<tr>
-<td style="text-align: left;">Mon Calamari</td>
-</tr>
-<tr>
-<td style="text-align: left;">Ewok</td>
-</tr>
-<tr>
-<td style="text-align: left;">Sullustan</td>
-</tr>
-<tr>
-<td style="text-align: left;">Neimodian</td>
-</tr>
-<tr>
-<td style="text-align: left;">Gungan</td>
-</tr>
-<tr>
-<td style="text-align: left;">Toydarian</td>
-</tr>
-<tr>
-<td style="text-align: left;">Dug</td>
-</tr>
-<tr>
-<td style="text-align: left;">Zabrak</td>
-</tr>
-<tr>
-<td style="text-align: left;">Twi’lek</td>
-</tr>
-<tr>
-<td style="text-align: left;">Aleena</td>
-</tr>
-<tr>
-<td style="text-align: left;">Vulptereen</td>
-</tr>
-<tr>
-<td style="text-align: left;">Xexto</td>
-</tr>
-<tr>
-<td style="text-align: left;">Toong</td>
-</tr>
-<tr>
-<td style="text-align: left;">Cerean</td>
-</tr>
-<tr>
-<td style="text-align: left;">Nautolan</td>
-</tr>
-<tr>
-<td style="text-align: left;">Tholothian</td>
-</tr>
-<tr>
-<td style="text-align: left;">Iktotchi</td>
-</tr>
-<tr>
-<td style="text-align: left;">Quermian</td>
-</tr>
-<tr>
-<td style="text-align: left;">Kel Dor</td>
-</tr>
-<tr>
-<td style="text-align: left;">Chagrian</td>
-</tr>
-<tr>
-<td style="text-align: left;">Geonosian</td>
-</tr>
-<tr>
-<td style="text-align: left;">Mirialan</td>
-</tr>
-<tr>
-<td style="text-align: left;">Clawdite</td>
-</tr>
-<tr>
-<td style="text-align: left;">Besalisk</td>
-</tr>
-<tr>
-<td style="text-align: left;">Kaminoan</td>
-</tr>
-<tr>
-<td style="text-align: left;">Skakoan</td>
-</tr>
-<tr>
-<td style="text-align: left;">Muun</td>
-</tr>
-<tr>
-<td style="text-align: left;">Togruta</td>
-</tr>
-<tr>
-<td style="text-align: left;">Kaleesh</td>
-</tr>
-<tr>
-<td style="text-align: left;">Pau’an</td>
+<td style="text-align: right;">38</td>
 </tr>
 </tbody>
 </table>
@@ -207,19 +117,10 @@ starwars %>% distinct(species) |> knitr::kable(format='markdown')
 5\. Найти самого высокого персонажа.
 
 ``` r
-print(starwars %>% select(name, height) %>% arrange(desc(height)), n=1)
-```
-
-    # A tibble: 87 × 2
-      name        height
-      <chr>        <int>
-    1 Yarael Poof    264
-    # ℹ 86 more rows
-
-6\. Найти всех персонажей ниже 170.
-
-``` r
-select(starwars, name, height) %>% filter(height>170) |> knitr::kable(format='markdown')
+starwars |>
+filter(height > 170) |>
+select(name, height) |>
+knitr::kable()
 ```
 
 <table>
@@ -453,10 +354,121 @@ select(starwars, name, height) %>% filter(height>170) |> knitr::kable(format='ma
 </tbody>
 </table>
 
+6\. Найти всех персонажей ниже 170.
+
+``` r
+starwars |>
+filter(height < 170) |>
+select(name, height) |>
+knitr::kable()
+```
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">name</th>
+<th style="text-align: right;">height</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">C-3PO</td>
+<td style="text-align: right;">167</td>
+</tr>
+<tr>
+<td style="text-align: left;">R2-D2</td>
+<td style="text-align: right;">96</td>
+</tr>
+<tr>
+<td style="text-align: left;">Leia Organa</td>
+<td style="text-align: right;">150</td>
+</tr>
+<tr>
+<td style="text-align: left;">Beru Whitesun Lars</td>
+<td style="text-align: right;">165</td>
+</tr>
+<tr>
+<td style="text-align: left;">R5-D4</td>
+<td style="text-align: right;">97</td>
+</tr>
+<tr>
+<td style="text-align: left;">Yoda</td>
+<td style="text-align: right;">66</td>
+</tr>
+<tr>
+<td style="text-align: left;">Mon Mothma</td>
+<td style="text-align: right;">150</td>
+</tr>
+<tr>
+<td style="text-align: left;">Wicket Systri Warrick</td>
+<td style="text-align: right;">88</td>
+</tr>
+<tr>
+<td style="text-align: left;">Nien Nunb</td>
+<td style="text-align: right;">160</td>
+</tr>
+<tr>
+<td style="text-align: left;">Watto</td>
+<td style="text-align: right;">137</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sebulba</td>
+<td style="text-align: right;">112</td>
+</tr>
+<tr>
+<td style="text-align: left;">Shmi Skywalker</td>
+<td style="text-align: right;">163</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ratts Tyerel</td>
+<td style="text-align: right;">79</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dud Bolt</td>
+<td style="text-align: right;">94</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gasgano</td>
+<td style="text-align: right;">122</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ben Quadinaros</td>
+<td style="text-align: right;">163</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cordé</td>
+<td style="text-align: right;">157</td>
+</tr>
+<tr>
+<td style="text-align: left;">Barriss Offee</td>
+<td style="text-align: right;">166</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dormé</td>
+<td style="text-align: right;">165</td>
+</tr>
+<tr>
+<td style="text-align: left;">Zam Wesell</td>
+<td style="text-align: right;">168</td>
+</tr>
+<tr>
+<td style="text-align: left;">Jocasta Nu</td>
+<td style="text-align: right;">167</td>
+</tr>
+<tr>
+<td style="text-align: left;">R4-P17</td>
+<td style="text-align: right;">96</td>
+</tr>
+</tbody>
+</table>
+
 7\. Подсчитать ИМТ (индекс массы тела) для всех персонажей.
 
 ``` r
-mutate(starwars, BMI=mass/((height/100)^2)) %>% select(name, height, mass, BMI) |> knitr::kable(format='markdown')
+starwars |>
+mutate(BMI = mass / ((height / 100)^2)) |>
+select(name, height, mass, BMI) |>
+knitr::kable()
 ```
 
 <table>
@@ -998,7 +1010,12 @@ mutate(starwars, BMI=mass/((height/100)^2)) %>% select(name, height, mass, BMI) 
 отношению массы (mass) к росту (height) персонажей.
 
 ``` r
-knitr::kable(format='markdown', head(mutate(starwars, my_param=mass/height) %>% arrange(my_param) %>% select(name, height, mass, my_param), n=10))
+starwars |>
+mutate(mass_to_height = mass / height) |>
+arrange(desc(mass_to_height)) |>
+select(name, height, mass, mass_to_height) |>
+slice_head(n = 10) |>
+knitr::kable()
 ```
 
 <table>
@@ -1007,69 +1024,69 @@ knitr::kable(format='markdown', head(mutate(starwars, my_param=mass/height) %>% 
 <th style="text-align: left;">name</th>
 <th style="text-align: right;">height</th>
 <th style="text-align: right;">mass</th>
-<th style="text-align: right;">my_param</th>
+<th style="text-align: right;">mass_to_height</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;">Ratts Tyerel</td>
-<td style="text-align: right;">79</td>
-<td style="text-align: right;">15</td>
-<td style="text-align: right;">0.1898734</td>
+<td style="text-align: left;">Jabba Desilijic Tiure</td>
+<td style="text-align: right;">175</td>
+<td style="text-align: right;">1358</td>
+<td style="text-align: right;">7.7600000</td>
 </tr>
 <tr>
-<td style="text-align: left;">Wicket Systri Warrick</td>
-<td style="text-align: right;">88</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">0.2272727</td>
+<td style="text-align: left;">Grievous</td>
+<td style="text-align: right;">216</td>
+<td style="text-align: right;">159</td>
+<td style="text-align: right;">0.7361111</td>
 </tr>
 <tr>
-<td style="text-align: left;">Padmé Amidala</td>
-<td style="text-align: right;">185</td>
-<td style="text-align: right;">45</td>
-<td style="text-align: right;">0.2432432</td>
+<td style="text-align: left;">IG-88</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: right;">0.7000000</td>
 </tr>
 <tr>
-<td style="text-align: left;">Wat Tambor</td>
-<td style="text-align: right;">193</td>
-<td style="text-align: right;">48</td>
-<td style="text-align: right;">0.2487047</td>
-</tr>
-<tr>
-<td style="text-align: left;">Yoda</td>
-<td style="text-align: right;">66</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">0.2575758</td>
-</tr>
-<tr>
-<td style="text-align: left;">Sly Moore</td>
+<td style="text-align: left;">Owen Lars</td>
 <td style="text-align: right;">178</td>
-<td style="text-align: right;">48</td>
-<td style="text-align: right;">0.2696629</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">0.6741573</td>
 </tr>
 <tr>
-<td style="text-align: left;">Adi Gallia</td>
-<td style="text-align: right;">184</td>
-<td style="text-align: right;">50</td>
-<td style="text-align: right;">0.2717391</td>
+<td style="text-align: left;">Darth Vader</td>
+<td style="text-align: right;">202</td>
+<td style="text-align: right;">136</td>
+<td style="text-align: right;">0.6732673</td>
 </tr>
 <tr>
-<td style="text-align: left;">Barriss Offee</td>
-<td style="text-align: right;">166</td>
-<td style="text-align: right;">50</td>
-<td style="text-align: right;">0.3012048</td>
+<td style="text-align: left;">Jek Tono Porkins</td>
+<td style="text-align: right;">180</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">0.6111111</td>
 </tr>
 <tr>
-<td style="text-align: left;">Ayla Secura</td>
-<td style="text-align: right;">178</td>
-<td style="text-align: right;">55</td>
-<td style="text-align: right;">0.3089888</td>
+<td style="text-align: left;">Bossk</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">0.5947368</td>
 </tr>
 <tr>
-<td style="text-align: left;">Shaak Ti</td>
-<td style="text-align: right;">178</td>
-<td style="text-align: right;">57</td>
-<td style="text-align: right;">0.3202247</td>
+<td style="text-align: left;">Tarfful</td>
+<td style="text-align: right;">234</td>
+<td style="text-align: right;">136</td>
+<td style="text-align: right;">0.5811966</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dexter Jettster</td>
+<td style="text-align: right;">198</td>
+<td style="text-align: right;">102</td>
+<td style="text-align: right;">0.5151515</td>
+</tr>
+<tr>
+<td style="text-align: left;">Chewbacca</td>
+<td style="text-align: right;">228</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">0.4912281</td>
 </tr>
 </tbody>
 </table>
@@ -1078,14 +1095,17 @@ knitr::kable(format='markdown', head(mutate(starwars, my_param=mass/height) %>% 
 войн.
 
 ``` r
-starwars %>% group_by(species) %>% summarise(Avg_age = median(100+birth_year, na.rm = TRUE)) |> knitr::kable(format='markdown')
+starwars |>
+group_by(species) |>
+summarise(median_age = median(100 + birth_year, na.rm = TRUE)) |>
+knitr::kable()
 ```
 
 <table>
 <thead>
 <tr>
 <th style="text-align: left;">species</th>
-<th style="text-align: right;">Avg_age</th>
+<th style="text-align: right;">median_age</th>
 </tr>
 </thead>
 <tbody>
@@ -1248,180 +1268,196 @@ starwars %>% group_by(species) %>% summarise(Avg_age = median(100+birth_year, na
 Звездных войн.
 
 ``` r
-starwars %>% count(eye_color) %>% filter(n == max(n))
+starwars |>
+count(eye_color, sort = TRUE) |>
+slice_head(n = 1) |>
+knitr::kable()
 ```
 
-    # A tibble: 1 × 2
-      eye_color     n
-      <chr>     <int>
-    1 brown        21
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">eye_color</th>
+<th style="text-align: right;">n</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">brown</td>
+<td style="text-align: right;">21</td>
+</tr>
+</tbody>
+</table>
 
 11\. Подсчитать среднюю длину имени в каждой расе вселенной Звездных
 войн.
 
 ``` r
-starwars %>% group_by(species) %>% summarise(Avg_age = median(nchar(name), na.rm = TRUE)) |> knitr::kable(format='markdown')
+starwars |>
+group_by(species) |>
+summarise(avg_name_length = mean(nchar(name), na.rm = TRUE)) |>
+knitr::kable()
 ```
 
 <table>
 <thead>
 <tr>
 <th style="text-align: left;">species</th>
-<th style="text-align: right;">Avg_age</th>
+<th style="text-align: right;">avg_name_length</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">Aleena</td>
-<td style="text-align: right;">12.0</td>
+<td style="text-align: right;">12.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Besalisk</td>
-<td style="text-align: right;">15.0</td>
+<td style="text-align: right;">15.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Cerean</td>
-<td style="text-align: right;">12.0</td>
+<td style="text-align: right;">12.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Chagrian</td>
-<td style="text-align: right;">10.0</td>
+<td style="text-align: right;">10.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Clawdite</td>
-<td style="text-align: right;">10.0</td>
+<td style="text-align: right;">10.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Droid</td>
-<td style="text-align: right;">5.0</td>
+<td style="text-align: right;">4.833333</td>
 </tr>
 <tr>
 <td style="text-align: left;">Dug</td>
-<td style="text-align: right;">7.0</td>
+<td style="text-align: right;">7.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Ewok</td>
-<td style="text-align: right;">21.0</td>
+<td style="text-align: right;">21.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Geonosian</td>
-<td style="text-align: right;">17.0</td>
+<td style="text-align: right;">17.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Gungan</td>
-<td style="text-align: right;">12.0</td>
+<td style="text-align: right;">11.666667</td>
 </tr>
 <tr>
 <td style="text-align: left;">Human</td>
-<td style="text-align: right;">11.0</td>
+<td style="text-align: right;">11.342857</td>
 </tr>
 <tr>
 <td style="text-align: left;">Hutt</td>
-<td style="text-align: right;">21.0</td>
+<td style="text-align: right;">21.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Iktotchi</td>
-<td style="text-align: right;">11.0</td>
+<td style="text-align: right;">11.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Kaleesh</td>
-<td style="text-align: right;">8.0</td>
+<td style="text-align: right;">8.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Kaminoan</td>
-<td style="text-align: right;">7.0</td>
+<td style="text-align: right;">7.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Kel Dor</td>
-<td style="text-align: right;">8.0</td>
+<td style="text-align: right;">8.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Mirialan</td>
-<td style="text-align: right;">14.0</td>
+<td style="text-align: right;">14.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Mon Calamari</td>
-<td style="text-align: right;">6.0</td>
+<td style="text-align: right;">6.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Muun</td>
-<td style="text-align: right;">8.0</td>
+<td style="text-align: right;">8.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Nautolan</td>
-<td style="text-align: right;">9.0</td>
+<td style="text-align: right;">9.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Neimodian</td>
-<td style="text-align: right;">11.0</td>
+<td style="text-align: right;">11.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Pau’an</td>
-<td style="text-align: right;">10.0</td>
+<td style="text-align: right;">10.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Quermian</td>
-<td style="text-align: right;">11.0</td>
+<td style="text-align: right;">11.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Rodian</td>
-<td style="text-align: right;">6.0</td>
+<td style="text-align: right;">6.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Skakoan</td>
-<td style="text-align: right;">10.0</td>
+<td style="text-align: right;">10.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Sullustan</td>
-<td style="text-align: right;">9.0</td>
+<td style="text-align: right;">9.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Tholothian</td>
-<td style="text-align: right;">10.0</td>
+<td style="text-align: right;">10.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Togruta</td>
-<td style="text-align: right;">8.0</td>
+<td style="text-align: right;">8.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Toong</td>
-<td style="text-align: right;">14.0</td>
+<td style="text-align: right;">14.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Toydarian</td>
-<td style="text-align: right;">5.0</td>
+<td style="text-align: right;">5.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Trandoshan</td>
-<td style="text-align: right;">5.0</td>
+<td style="text-align: right;">5.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Twi’lek</td>
-<td style="text-align: right;">11.0</td>
+<td style="text-align: right;">11.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Vulptereen</td>
-<td style="text-align: right;">8.0</td>
+<td style="text-align: right;">8.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Wookiee</td>
-<td style="text-align: right;">8.0</td>
+<td style="text-align: right;">8.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Xexto</td>
-<td style="text-align: right;">7.0</td>
+<td style="text-align: right;">7.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Yoda’s species</td>
-<td style="text-align: right;">4.0</td>
+<td style="text-align: right;">4.000000</td>
 </tr>
 <tr>
 <td style="text-align: left;">Zabrak</td>
-<td style="text-align: right;">9.5</td>
+<td style="text-align: right;">9.500000</td>
 </tr>
 <tr>
 <td style="text-align: left;">NA</td>
-<td style="text-align: right;">10.5</td>
+<td style="text-align: right;">10.500000</td>
 </tr>
 </tbody>
 </table>
