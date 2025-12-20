@@ -1,5 +1,5 @@
 ---
-title: "Введение в R"
+title: "1ПР Введение в R"
 subtitle: "lab1"
 author: "gleb.plokhikh@yandex.ru"
 format: 
