@@ -1,5 +1,5 @@
 ---
-title: "Исследование метаданных DNS трафика"
+title: "4ПР Исследование метаданных DNS трафика"
 subtitle: "lab4"
 author: "gleb.plokhikh@yandex.ru"
 format: 
