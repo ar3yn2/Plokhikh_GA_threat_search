@@ -1,4 +1,4 @@
-# Основы обработки данных с помощью R и Dplyr
+# 3ПР Основы обработки данных с помощью R и Dplyr
 gleb.plokhikh@yandex.ru
 
 ## Цель работы
@@ -23,24 +23,9 @@ gleb.plokhikh@yandex.ru
 
 ## Решение:
 
-1\. Установка датафрейма.
-
-    install.packages('nycflights13')
-    Устанавливаю пакет в ‘C:/Users/timav/AppData/Local/R/win-library/4.5’
-    (потому что ‘lib’ не определено)
-    пробую URL 'https://cran.rstudio.com/bin/windows/contrib/4.5/nycflights13_1.0.2.zip'
-    Content type 'application/zip' length 4511557 bytes (4.3 MB)
-    downloaded 4.3 MB
-
-    пакет ‘nycflights13’ успешно распакован, MD5-суммы проверены
-
-    Скачанные бинарные пакеты находятся в
-        C:\Users\timav\AppData\Local\Temp\Rtmp44Qhin\downloaded_packages
-
-2\. Загрузка библиотек
+1\. Загрузка библиотек
 
 ``` r
-library(nycflights13)
 library(dplyr)
 ```
 
@@ -57,9 +42,10 @@ library(dplyr)
 
 ``` r
 library(knitr)
+library(nycflights13)
 ```
 
-3\. Сколько встроенных в пакет `nycflights13` датафреймов?
+2\. Сколько встроенных в пакет `nycflights13` датафреймов?
 
 ``` r
 data(package = "nycflights13")$results[, "Item"]
@@ -67,95 +53,54 @@ data(package = "nycflights13")$results[, "Item"]
 
     [1] "airlines" "airports" "flights"  "planes"   "weather" 
 
-4\. Сколько строк в каждом датафрейме?
+3\. Сколько строк и столбцов в каждом датафрейме?
 
 ``` r
-airlines %>% nrow()
+tibble(
+dataset = c("airlines", "airports", "flights", "planes", "weather"),
+rows = c(nrow(airlines), nrow(airports), nrow(flights), nrow(planes), nrow(weather)),
+cols = c(ncol(airlines), ncol(airports), ncol(flights), ncol(planes), ncol(weather))
+) |> knitr::kable()
 ```
 
-    [1] 16
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">dataset</th>
+<th style="text-align: right;">rows</th>
+<th style="text-align: right;">cols</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">airlines</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">airports</td>
+<td style="text-align: right;">1458</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr>
+<td style="text-align: left;">flights</td>
+<td style="text-align: right;">336776</td>
+<td style="text-align: right;">19</td>
+</tr>
+<tr>
+<td style="text-align: left;">planes</td>
+<td style="text-align: right;">3322</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr>
+<td style="text-align: left;">weather</td>
+<td style="text-align: right;">26115</td>
+<td style="text-align: right;">15</td>
+</tr>
+</tbody>
+</table>
 
-``` r
-airports %>% nrow()
-```
-
-    [1] 1458
-
-``` r
-flights %>% nrow()
-```
-
-    [1] 336776
-
-``` r
-planes %>% nrow()
-```
-
-    [1] 3322
-
-``` r
-weather %>% nrow()
-```
-
-    [1] 26115
-
-5\. Сколько столбцов в каждом датафрейме?
-
-``` r
-airlines %>% ncol()
-```
-
-    [1] 2
-
-``` r
-airports %>% ncol()
-```
-
-    [1] 8
-
-``` r
-flights %>% ncol()
-```
-
-    [1] 19
-
-``` r
-planes %>% ncol()
-```
-
-    [1] 9
-
-``` r
-weather %>% ncol()
-```
-
-    [1] 15
-
-6\. Как просмотреть примерный вид датафрейма?
-
-``` r
-glimpse(airlines)
-```
-
-    Rows: 16
-    Columns: 2
-    $ carrier <chr> "9E", "AA", "AS", "B6", "DL", "EV", "F9", "FL", "HA", "MQ", "O…
-    $ name    <chr> "Endeavor Air Inc.", "American Airlines Inc.", "Alaska Airline…
-
-``` r
-glimpse(airports)
-```
-
-    Rows: 1,458
-    Columns: 8
-    $ faa   <chr> "04G", "06A", "06C", "06N", "09J", "0A9", "0G6", "0G7", "0P2", "…
-    $ name  <chr> "Lansdowne Airport", "Moton Field Municipal Airport", "Schaumbur…
-    $ lat   <dbl> 41.13047, 32.46057, 41.98934, 41.43191, 31.07447, 36.37122, 41.4…
-    $ lon   <dbl> -80.61958, -85.68003, -88.10124, -74.39156, -81.42778, -82.17342…
-    $ alt   <dbl> 1044, 264, 801, 523, 11, 1593, 730, 492, 1000, 108, 409, 875, 10…
-    $ tz    <dbl> -5, -6, -6, -5, -5, -5, -5, -5, -5, -8, -5, -6, -5, -5, -5, -5, …
-    $ dst   <chr> "A", "A", "A", "A", "A", "A", "A", "A", "U", "A", "A", "U", "A",…
-    $ tzone <chr> "America/New_York", "America/Chicago", "America/Chicago", "Ameri…
+4\. Просмотр структуры данных
 
 ``` r
 glimpse(flights)
@@ -184,22 +129,6 @@ glimpse(flights)
     $ time_hour      <dttm> 2013-01-01 05:00:00, 2013-01-01 05:00:00, 2013-01-01 0…
 
 ``` r
-glimpse(planes)
-```
-
-    Rows: 3,322
-    Columns: 9
-    $ tailnum      <chr> "N10156", "N102UW", "N103US", "N104UW", "N10575", "N105UW…
-    $ year         <int> 2004, 1998, 1999, 1999, 2002, 1999, 1999, 1999, 1999, 199…
-    $ type         <chr> "Fixed wing multi engine", "Fixed wing multi engine", "Fi…
-    $ manufacturer <chr> "EMBRAER", "AIRBUS INDUSTRIE", "AIRBUS INDUSTRIE", "AIRBU…
-    $ model        <chr> "EMB-145XR", "A320-214", "A320-214", "A320-214", "EMB-145…
-    $ engines      <int> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, …
-    $ seats        <int> 55, 182, 182, 182, 55, 182, 182, 182, 182, 182, 55, 55, 5…
-    $ speed        <int> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
-    $ engine       <chr> "Turbo-fan", "Turbo-fan", "Turbo-fan", "Turbo-fan", "Turb…
-
-``` r
 glimpse(weather)
 ```
 
@@ -221,17 +150,17 @@ glimpse(weather)
     $ visib      <dbl> 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,…
     $ time_hour  <dttm> 2013-01-01 01:00:00, 2013-01-01 02:00:00, 2013-01-01 03:00…
 
-7\. Сколько компаний-перевозчиков (carrier) учитывают эти наборы данных
+5\. Сколько компаний-перевозчиков (carrier) учитывают эти наборы данных
 (представлено в наборах данных)?
 
 ``` r
-nrow(airlines %>% select(carrier) %>% distinct()) |> knitr::kable(format='markdown')
+airlines |> distinct(carrier) |> count() |> knitr::kable()
 ```
 
 <table>
 <thead>
 <tr>
-<th style="text-align: right;">x</th>
+<th style="text-align: right;">n</th>
 </tr>
 </thead>
 <tbody>
@@ -241,16 +170,19 @@ nrow(airlines %>% select(carrier) %>% distinct()) |> knitr::kable(format='markdo
 </tbody>
 </table>
 
-8\. Сколько рейсов принял аэропорт John F Kennedy Intl в мае?
+6\. Сколько рейсов принял аэропорт John F Kennedy Intl в мае?
 
 ``` r
-nrow(flights %>% filter(origin=='JFK', month==5)) |> knitr::kable(format='markdown')
+flights |>
+filter(origin == "JFK", month == 5) |>
+summarise(total_flights = n()) |>
+knitr::kable()
 ```
 
 <table>
 <thead>
 <tr>
-<th style="text-align: right;">x</th>
+<th style="text-align: right;">total_flights</th>
 </tr>
 </thead>
 <tbody>
@@ -260,19 +192,63 @@ nrow(flights %>% filter(origin=='JFK', month==5)) |> knitr::kable(format='markdo
 </tbody>
 </table>
 
-9\. Какой самый северный аэропорт?
-
-    airports %>% arrange(desc(lat)) %>% slice(1) |> knitr::kable(format='markdown')
-
-10\. Какой аэропорт самый высокогорный (находится выше всех над уровнем
-моря)?
-
-    airports %>% arrange(desc(alt)) %>% slice(1) |> knitr::kable(format='markdown')
-
-11\. Какие бортовые номера у самых старых самолетов?
+7\. Какой самый северный аэропорт?
 
 ``` r
-planes %>% select(tailnum, year) %>% arrange(year) %>% slice(1:20) |> knitr::kable(format='markdown')
+airports |>
+slice_max(lat, n = 1) |>
+select(name, lat) |>
+knitr::kable()
+```
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">name</th>
+<th style="text-align: right;">lat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Dillant Hopkins Airport</td>
+<td style="text-align: right;">72.27083</td>
+</tr>
+</tbody>
+</table>
+
+8\. Аэропорт с наибольшей высотой над уровнем моря
+
+``` r
+airports |>
+slice_max(alt, n = 1) |>
+select(name, alt) |>
+knitr::kable()
+```
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">name</th>
+<th style="text-align: right;">alt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Telluride</td>
+<td style="text-align: right;">9078</td>
+</tr>
+</tbody>
+</table>
+
+9\. Какие бортовые номера у самых старых самолетов?
+
+``` r
+planes |>
+filter(!is.na(year)) |>
+arrange(year) |>
+select(tailnum, year) |>
+slice_head(n = 10) |>
+knitr::kable()
 ```
 
 <table>
@@ -323,50 +299,10 @@ planes %>% select(tailnum, year) %>% arrange(year) %>% slice(1:20) |> knitr::kab
 <td style="text-align: left;">N364AA</td>
 <td style="text-align: right;">1973</td>
 </tr>
-<tr>
-<td style="text-align: left;">N840MQ</td>
-<td style="text-align: right;">1974</td>
-</tr>
-<tr>
-<td style="text-align: left;">N508AA</td>
-<td style="text-align: right;">1975</td>
-</tr>
-<tr>
-<td style="text-align: left;">N621AA</td>
-<td style="text-align: right;">1975</td>
-</tr>
-<tr>
-<td style="text-align: left;">N675MC</td>
-<td style="text-align: right;">1975</td>
-</tr>
-<tr>
-<td style="text-align: left;">N545AA</td>
-<td style="text-align: right;">1976</td>
-</tr>
-<tr>
-<td style="text-align: left;">N711MQ</td>
-<td style="text-align: right;">1976</td>
-</tr>
-<tr>
-<td style="text-align: left;">N762NC</td>
-<td style="text-align: right;">1976</td>
-</tr>
-<tr>
-<td style="text-align: left;">N737MQ</td>
-<td style="text-align: right;">1977</td>
-</tr>
-<tr>
-<td style="text-align: left;">N767NC</td>
-<td style="text-align: right;">1977</td>
-</tr>
-<tr>
-<td style="text-align: left;">N376AA</td>
-<td style="text-align: right;">1978</td>
-</tr>
 </tbody>
 </table>
 
-12\. Какая средняя температура воздуха была в сентябре в аэропорту John
+10\. Какая средняя температура воздуха была в сентябре в аэропорту John
 F Kennedy Intl (в градусах Цельсия).
 
 ``` r
@@ -386,17 +322,23 @@ weather %>% filter(origin=='JFK', month==9) %>% summarize(mean_temp = (mean(temp
 </tbody>
 </table>
 
-13\. Самолеты какой авиакомпании совершили больше всего вылетов в июне?
+11\. Авиакомпания с наибольшим числом вылетов в июне
 
 ``` r
-flights %>% left_join(airlines, join_by(carrier)) %>% filter(month == 6)%>%group_by(name) %>% summarise(amount = n()) %>% arrange(desc(amount)) %>% slice(1) %>% select(name, amount) |> knitr::kable(format='markdown')
+flights |>
+filter(month == 6) |>
+count(carrier, sort = TRUE) |>
+left_join(airlines, by = "carrier") |>
+slice(1) |>
+select(name, n) |>
+knitr::kable()
 ```
 
 <table>
 <thead>
 <tr>
 <th style="text-align: left;">name</th>
-<th style="text-align: right;">amount</th>
+<th style="text-align: right;">n</th>
 </tr>
 </thead>
 <tbody>
@@ -407,17 +349,23 @@ flights %>% left_join(airlines, join_by(carrier)) %>% filter(month == 6)%>%group
 </tbody>
 </table>
 
-14\. Самолеты какой авиакомпании задерживались чаще других в 2013 году?
+12\. Авиакомпания с наибольшим числом задержек в 2013 году
 
 ``` r
-flights %>% left_join(airlines, join_by(carrier)) %>% group_by(name) %>% filter(arr_delay > 0 & year == 2013) %>% summarise(amount = n()) %>% arrange(desc(amount)) %>% slice(1) %>% select(name, amount) |> knitr::kable(format='markdown')
+flights |>
+filter(year == 2013, arr_delay > 0) |>
+count(carrier, sort = TRUE) |>
+left_join(airlines, by = "carrier") |>
+slice(1) |>
+select(name, n) |>
+knitr::kable()
 ```
 
 <table>
 <thead>
 <tr>
 <th style="text-align: left;">name</th>
-<th style="text-align: right;">amount</th>
+<th style="text-align: right;">n</th>
 </tr>
 </thead>
 <tbody>
@@ -436,7 +384,6 @@ dplyr набор данных `nycflights13` с помощью языка R.
 ## Вывод
 
 Таким образом, мы развили практические навыки использования языка
-программирования R для обработки данных, закрепили знания базовых типов
-данных языка R, развили практические навыки использования функций
-обработки данных пакета dplyr – функции select(), filter(), mutate(),
-arrange(), group_by().
+программирования R для обработки данных, развили практические навыки
+использования функций обработки данных пакета dplyr – функции select(),
+filter(), mutate(), arrange(), group_by().
