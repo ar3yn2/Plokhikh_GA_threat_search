@@ -124,7 +124,7 @@ WHERE (SUBSTRING(src, 0, 3) = "12." OR SUBSTRING(src, 0, 3) = "13." OR SUBSTRING
 ```sql
 SELECT SUM(bytes)
 FROM 
-   `arrow_bind_kolomytsev`
+   `arrow_bind_plokhikh`
 WHERE (SUBSTRING(dst, 0, 3) = "12." OR SUBSTRING(dst, 0, 3) = "13." OR SUBSTRING(dst, 0, 3) = "14.")
         AND
        (SUBSTRING(src, 0, 3) != "12." AND SUBSTRING(src, 0, 3) != "13." AND SUBSTRING(src, 0, 3) != "14.");
