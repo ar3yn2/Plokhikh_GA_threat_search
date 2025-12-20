@@ -21,271 +21,174 @@ format:
 
 ## План
 
-1. Импортируйте данные DNS – https://storage.yandexcloud.net/dataset.ctfsec/dns.zip
-Данные были собраны с помощью сетевого анализатора zeek
-2. Добавьте пропущенные данные о структуре данных (назначении столбцов)
-3. Преобразуйте данные в столбцах в нужный формат,просмотрите общую структуру данных с помощью функции glimpse()
-4. Сколько участников информационного обмена всети Доброй Организации?
-5. Какое соотношение участников обмена внутрисети и участников обращений к внешним ресурсам?
-6. Найдите топ-10 участников сети, проявляющих наибольшую сетевую активность.
-7. Найдите топ-10 доменов, к которым обращаются пользователи сети и соответственное количество обращений
-8. Опеределите базовые статистические характеристики (функция summary() ) интервала времени между последовательными обращениями к топ-10 доменам.
-9. Часто вредоносное программное обеспечение использует DNS канал в качестве канала управления, периодически отправляя запросы на подконтрольный злоумышленникам DNS сервер. По периодическим запросам на один и тот же домен можно выявить скрытый DNS канал. Есть ли такие IP адреса в исследуемом датасете?
-10. Определите местоположение (страну, город) и организацию-провайдера для топ-10 доменов. Для этого можно использовать сторонние сервисы,например http://ip-api.com (API-эндпоинт –
-http://ip-api.com/json).
+1. Импорт данных и распаковка.
+2. Настройка корректной структуры столбцов.
+3. Преобразование типов данных.
+4. Анализ участников обмена.
+5. Определение топ-10 активных IP и доменов.
+6. Статистический анализ интервалов времени.
+7. Поиск IP с периодической активностью.
+8. Определение геолокации топ-доменов.
 
 ## Шаги:
 
-1\. Импортируем данные DNS
+1\. Загрузка и подготовка данных
 
 ```{r}
-options(repos = c(CRAN = "https://mirror.truenetwork.ru/CRAN/"))
-install.packages("readr")
-install.packages("dplyr")
-install.packages("stringr")
-install.packages("httr")
-install.packages("jsonlite")
-library(httr)
-library(jsonlite)
 library(readr)
 library(dplyr)
 library(stringr)
+library(httr)
+library(jsonlite)
+library(purrr)
 library(knitr)
+
 temp_dir <- tempdir()
+zip_file <- file.path(temp_dir, "dns_archive.zip")
 download.file(
   url = "https://storage.yandexcloud.net/dataset.ctfsec/dns.zip",
-  destfile = file.path(temp_dir, "dns.zip"),
+  destfile = zip_file,
   mode = "wb"
 )
-unzip(
-  zipfile = file.path(temp_dir, "dns.zip"),
-  exdir = temp_dir
+unzip(zip_file, exdir = temp_dir)
+log_paths <- list.files(temp_dir, pattern = "\\.log$", full.names = TRUE)
+```
+
+2\. Настройка структуры данных
+
+```{r}
+dns_columns <- c(
+"ts","uid","src_ip","src_port","dst_ip","dst_port",
+"protocol","trans_id","query","qclass","qclass_name",
+"qtype","qtype_name","rcode","rcode_name","AA","TC",
+"RD","RA","Z","answers","TTLs","rejected"
 )
-log_files <- list.files(temp_dir, pattern = "\\.log$", full.names = TRUE)
+
+dns_tbl <- read_delim(
+log_paths[1],
+delim = "\t",
+col_names = dns_columns,
+comment = "#",
+na = c("", "NA", "-"),
+trim_ws = TRUE,
+show_col_types = FALSE
+) %>% as_tibble()
 ```
 
-2\. Добавьте пропущенные данные о структуре данных (назначении столбцов)
+3\. Преобразование данные в столбцах в нужный формат
 
 ```{r}
-column_names <- c(
-  "timestamp", "uid", "source_ip", "source_port", "destination_ip", 
-  "destination_port", "protocol", "transaction_id", "query", "qclass", 
-  "qclass_name", "qtype", "qtype_name", "rcode", "rcode_name", 
-  "AA", "TC", "RD", "RA", "Z", "answers", "TTLS", "rejected"
+dns_tbl_clean <- dns_tbl %>%
+transmute(
+timestamp = as.POSIXct(ts, origin="1970-01-01"),
+src_ip,
+src_port = as.numeric(src_port),
+dst_ip,
+dst_port = as.numeric(dst_port),
+protocol,
+trans_id = as.numeric(trans_id),
+query,
+qclass = as.numeric(qclass),
+qtype = as.numeric(qtype),
+rcode = as.numeric(rcode)
 )
-dns_data <- invisible(read_delim(
-  log_files[1],
-  delim = "\t",
-  col_names = column_names,
-  comment = "#",
-  na = c("", "NA", "-"),
-  trim_ws = TRUE,
-  show_col_types = FALSE
-)) %>% as_tibble()
-head(dns_data,10)
 ```
 
-3\. Преобразуйте данные в столбцах в нужный формат
+4\. Участники информационного обмена
 
 ```{r}
-dns_data_clean <- dns_data %>%
-  mutate(
-    timestamp = as.POSIXct(timestamp, origin = "1970-01-01"),
-    source_port = as.numeric(source_port),
-    destination_port = as.numeric(destination_port),
-    transaction_id = as.numeric(transaction_id),
-    qclass = as.numeric(qclass),
-    qtype = as.numeric(qtype),
-    rcode = as.numeric(rcode),
-  ) %>% as_tibble()
-head(dns_data_clean,10)
-
+all_ips <- unique(c(dns_tbl_clean$src_ip, dns_tbl_clean$dst_ip))
+total_participants <- length(all_ips)
+internal_ips <- all_ips[
+  grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", all_ips)
+]
+external_ips <- setdiff(all_ips, internal_ips)
+ratio_internal_external <- length(internal_ips) / length(external_ips)
+external_ips <- setdiff(all_ips, internal_ips)
+ratio_internal_external <- length(internal_ips)/length(external_ips)
 ```
 
-4\. Сколько участников информационного обмена в сети Доброй Организации?
+5\. Топ-10 активных участников и доменов
 
 ```{r}
-unique_source_ips <- unique(dns_data_clean$source_ip)
-unique_destination_ips <- unique(dns_data_clean$destination_ip)
-all_ips<-unique(c(unique_source_ips, unique_destination_ips))
-length(all_ips)
+top_ips <- dns_tbl_clean %>%
+count(src_ip, sort = TRUE) %>%
+slice_head(n = 10)
+top_domains <- dns_tbl_clean %>%
+count(query, sort = TRUE) %>%
+slice_head(n = 10)
 ```
 
-5\. Какое соотношение участников обмена внутрисети и участников обращений к внешним ресурсам?
+6\. Статистика интервалов между запросами для топ-доменов
 
 ```{r}
-internal_ips <- all_ips[grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", all_ips)]
-external_ips <- all_ips[!grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", all_ips)]
-length(internal_ips) / length(external_ips)
-
+top_domain_data <- dns_tbl_clean %>%
+filter(query %in% top_domains$query) %>%
+arrange(query, timestamp)
+domain_stats <- map_dfr(top_domains$query, function(dom) {
+df <- filter(top_domain_data, query == dom)
+times <- as.numeric(df$timestamp)
+if(length(times) > 1){
+diffs <- diff(times)
+tibble(
+Domain = dom,
+Min = min(diffs),
+Q1 = quantile(diffs, 0.25),
+Median = median(diffs),
+Mean = mean(diffs),
+Q3 = quantile(diffs, 0.75),
+Max = max(diffs))}
+})
 ```
 
-6\. Найдите топ-10 участников сети, проявляющих наибольшую сетевую активность.
+8\. Поиск IP с периодической активностью
 
 ```{r}
-dns_data_clean%>%
-  group_by(source_ip)%>%
-  count(sort = TRUE) %>%
-  as_tibble() %>%
-  head(10)
+suspicious_activity <- map_dfr(top_domains$query, function(dom) {
+df <- filter(dns_tbl_clean, query == dom)
+ips <- unique(df$src_ip)
+map_dfr(ips, function(ip){
+subdf <- filter(df, src_ip == ip)
+if(nrow(subdf) >= 5){
+ts_sorted <- sort(as.numeric(subdf$timestamp))
+intervals <- diff(ts_sorted)
+avg_int <- mean(intervals)
+sd_int <- sd(intervals)
+tibble(
+src_ip = ip,
+domain = dom,
+requests = nrow(subdf),
+avg_interval = avg_int,
+std_dev = sd_int,
+is_periodic = sd_int < 0.5*avg_int
+) %>% filter(is_periodic)}})
+})
 ```
 
-7\. Найдите топ-10 доменов, к которым обращаются пользователи сети и соответственное количество обращений
+8\. Определение геолокации для топ-доменов
 
 ```{r}
-top_10_domains <- dns_data_clean%>%count(query, sort = TRUE) %>%
-  as_tibble() %>% head(10)
-top_10_domains
-```
-
-8\. Опеределите базовые статистические характеристики (функция summary() ) интервала времени между последовательными обращениями к топ-10 доменам.
-
-```{r}
-top_domains_data <- dns_data_clean[dns_data_clean$query %in% top_10_domains$query, ]
-top_domains_data <- top_domains_data[order(top_domains_data$query, top_domains_data$timestamp), ]
-results <- data.frame(
-  Domain = character(),
-  Min = numeric(),
-  Q1 = numeric(),
-  Median = numeric(),
-  Mean = numeric(),
-  Q3 = numeric(),
-  Max = numeric()
-)
-for(domain in top_10_domains$query) {
-  domain_data <- top_domains_data[top_domains_data$query == domain, ]
-  domain_data <- domain_data[!is.na(domain_data$timestamp), ]
-  
-  if(nrow(domain_data) > 1) {
-    time_diffs <- diff(as.numeric(domain_data$timestamp))
-    domain_stats <- summary(time_diffs)
-    results <- rbind(results, data.frame(
-      Domain = domain,
-      Min = as.numeric(domain_stats["Min."]),
-      Q1 = as.numeric(domain_stats["1st Qu."]),
-      Median = as.numeric(domain_stats["Median"]),
-      Mean = as.numeric(domain_stats["Mean"]),
-      Q3 = as.numeric(domain_stats["3rd Qu."]),
-      Max = as.numeric(domain_stats["Max."])
-    ))
-  }
+domain_ips <- dns_tbl_clean %>%
+filter(query %in% top_domains$query) %>%
+group_by(query) %>%
+summarise(ip_address = first(dst_ip), .groups = "drop")
+get_geo <- function(ip){
+if (grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", ip))
+return(tibble(country="Private", city="Private", isp="Private"))
+res <- tryCatch({
+r <- GET(paste0("http://ip-api.com/json/", ip))
+if(status_code(r)==200){
+info <- fromJSON(content(r,"text"))
+if(info$status=="success")
+tibble(country=info$country, city=info$city, isp=info$isp)
+else tibble(country="Unknown", city="Unknown", isp="Unknown")
+} else tibble(country="API error", city="API error", isp="API error")
+}, error=function(e) tibble(country="Error", city="Error", isp="Error"))
+Sys.sleep(1)
+res
 }
-results
-```
-
-9\. Поиск IP-адресов с периодическими запросами на один домен (из топ-10 доменов)
-
-```{r}
-top_domains <- top_10_domains$query
-periodic_analysis <- data.frame(
-  source_ip = character(),
-  domain = character(),
-  request_count = integer(),
-  avg_interval = numeric(),
-  std_dev = numeric(),
-  is_periodic = logical()
-)
-for(domain in top_domains) {
-  domain_data <- dns_data_clean[dns_data_clean$query == domain, ]
-  domain_data <- domain_data[!is.na(domain_data$timestamp), ]
-  unique_ips <- unique(domain_data$source_ip)
-  for(ip in unique_ips) {
-    ip_data <- domain_data[domain_data$source_ip == ip, ]
-    if(nrow(ip_data) >= 5) {
-      ip_data <- ip_data[order(ip_data$timestamp), ]
-      timestamps <- as.numeric(ip_data$timestamp)
-      intervals <- diff(timestamps)
-      avg_interval <- mean(intervals)
-      std_dev <- sd(intervals)
-      is_periodic <- std_dev < avg_interval * 0.5
-      periodic_analysis <- rbind(periodic_analysis, data.frame(
-        source_ip = ip,
-        domain = domain,
-        request_count = nrow(ip_data),
-        avg_interval = avg_interval,
-        std_dev = std_dev,
-        is_periodic = is_periodic
-      ))
-    }
-  }
-}
-suspicious_ips <- periodic_analysis[periodic_analysis$is_periodic == TRUE, ] %>%
-  as_tibble()
-suspicious_ips
-```
-
-10.\ Определение местоположения и провайдера для топ-10 доменов через их IP-адреса
-
-```{r}
-top_domains <- top_10_domains$query
-domain_ip_mapping <- data.frame(
-  domain = character(),
-  ip_address = character()
-)
-for (domain in top_domains) {
-  domain_data <- dns_data_clean[dns_data_clean$query == domain, ]
-  if (nrow(domain_data) > 0) {
-    ip <- domain_data$destination_ip[1]
-    domain_ip_mapping <- rbind(domain_ip_mapping, data.frame(
-      domain = domain,
-      ip_address = ip
-    ))
-  }
-}
-domain_geo_info <- data.frame(
-  domain = character(),
-  ip_address = character(),
-  country = character(),
-  city = character(),
-  isp = character(),
-  stringsAsFactors = FALSE
-)
-for (i in 1:nrow(domain_ip_mapping)) {
-  domain <- domain_ip_mapping$domain[i]
-  ip <- domain_ip_mapping$ip_address[i]
-  if (grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", ip)) {
-    domain_geo_info <- rbind(domain_geo_info, data.frame(
-      domain = domain,
-      ip_address = ip,
-      country = "Частный IP",
-      city = "Частный IP",
-      isp = "Частный IP"
-    ))
-    next
-  }
-  url <- paste0("http://ip-api.com/json/", ip)
-  response <- GET(url)
-  if (status_code(response) == 200) {
-    data <- fromJSON(content(response, "text"))
-    if (data$status == "success") {
-      domain_geo_info <- rbind(domain_geo_info, data.frame(
-        domain = domain,
-        ip_address = ip,
-        country = data$country,
-        city = data$city,
-        isp = data$isp
-      ))%>% as_tibble()
-    } else {
-      domain_geo_info <- rbind(domain_geo_info, data.frame(
-        domain = domain,
-        ip_address = ip,
-        country = "Не определено",
-        city = "Не определено",
-        isp = "Не определено"
-      ))%>% as_tibble()
-    }
-  } else {
-    domain_geo_info <- rbind(domain_geo_info, data.frame(
-      domain = domain,
-      ip_address = ip,
-      country = "Ошибка API",
-      city = "Ошибка API",
-      isp = "Ошибка API"
-    )) %>% as_tibble()
-  }
-  Sys.sleep(1)
-}
-domain_geo_info
+geo_info <- map_dfr(domain_ips$ip_address, get_geo) %>%
+bind_cols(domain_ips)
 ```
 
 ## Оценка результата
