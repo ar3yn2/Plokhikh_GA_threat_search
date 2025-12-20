@@ -22,23 +22,15 @@ gleb.plokhikh@yandex.ru
 
 1.  Подготовка данных для анализа
 2.  Анализ датасета
-3.  Оформление отчета
 
 ## Шаги:
 
-### Подготовка данных
+## Подготовка данных
 
-1.Импортируйте данных
+1.Импорт данных
 
 ``` r
 library(jsonlite)
-library(xml2)
-library(rvest)
-```
-
-    Warning: пакет 'rvest' был собран под R версии 4.5.2
-
-``` r
 library(dplyr)
 ```
 
@@ -73,22 +65,40 @@ library(purrr)
         flatten
 
 ``` r
-src_url <- "https://storage.yandexcloud.net/iamcth-data/dataset.tar.gz"
-tmp_tar <- "ad_logs.tar.gz"
-
-download.file(src_url, tmp_tar, mode = "wb", quiet = TRUE)
-
-tar_contents <- untar(tmp_tar, list = TRUE)
-json_path <- tar_contents[grep("\\.json$", tar_contents)]
-
-tmp_dir <- tempdir()
-untar(tmp_tar, files = json_path, exdir = tmp_dir)
-
-full_json <- file.path(tmp_dir, json_path)
-
-json_conn <- file(full_json, open = "r")
-logs_raw <- stream_in(json_conn)
+library(rvest)
 ```
+
+    Warning: пакет 'rvest' был собран под R версии 4.5.2
+
+``` r
+library(xml2)
+```
+
+2.Скачать архив
+
+``` r
+archive_url <- "https://storage.yandexcloud.net/iamcth-data/dataset.tar.gz"
+archive_file <- "ad_logs_downloaded.tar.gz"
+download.file(archive_url, archive_file, mode = "wb")
+```
+
+3.Содержимое и извлечение JSON
+
+``` r
+contents <- untar(archive_file, list = TRUE)
+json_file <- contents[grep("\\.json$", contents)]
+tmp_extract <- tempdir()
+untar(archive_file, files = json_file, exdir = tmp_extract)
+json_full <- file.path(tmp_extract, json_file)
+```
+
+4.Чтение JSON
+
+``` r
+raw_logs <- stream_in(file(json_full))
+```
+
+    opening file input connection.
 
 
      Found 500 records...
@@ -297,164 +307,141 @@ logs_raw <- stream_in(json_conn)
      Found 101904 records...
      Imported 101904 records. Simplifying...
 
+    closing file input connection.
+
 ``` r
-cat("Строк импортировано:", nrow(logs_raw), "\n")
+cat("Количество записей в исходных логах:", nrow(raw_logs), "\n")
 ```
 
-    Строк импортировано: 101904 
+    Количество записей в исходных логах: 101904 
+
+## 2.Аккуратная форма:
+
+1.  
 
 ``` r
-events_url <- "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor"
-html_doc <- read_html(events_url)
-event_ref <- html_table(html_doc, fill = TRUE)[[1]]
-```
-
-2.Приведение данных к “аккуратной” форме:
-
-``` r
-logs_prepared <- logs_raw %>%
+logs_clean <- raw_logs %>%
 mutate(
-time = as.POSIXct(`@timestamp`, format = "%Y-%m-%dT%H:%M:%OSZ"),
-across(where(is.character), ~ifelse(. == "", NA, .))
+event_ts = as.POSIXct(`@timestamp`, format="%Y-%m-%dT%H:%M:%OSZ"),
+across(where(is.character), ~na_if(., ""))
 )
-
-cat("Строк:", nrow(logs_prepared), "Колонок:", ncol(logs_prepared), "\n")
 ```
 
-    Строк: 101904 Колонок: 10 
-
-3.Просмотрите общую структуру данных с помощью функции glimpse()
+2.Вложенные столбцы
 
 ``` r
-glimpse(logs_prepared)
+nested_cols <- names(logs_clean)[map_lgl(logs_clean, is.data.frame)]
+logs_flat <- logs_clean
+for (col in nested_cols) {
+logs_flat <- unnest_wider(logs_flat, all_of(col), names_sep = "_")
+}
+```
+
+3.Убираем колонки с одним значением
+
+``` r
+logs_flat <- logs_flat %>% select(where(~ n_distinct(., na.rm = TRUE) > 1))
+glimpse(logs_flat)
 ```
 
     Rows: 101,904
-    Columns: 10
-    $ `@timestamp` <chr> "2019-10-20T20:11:06.937Z", "2019-10-20T20:11:07.101Z", "…
-    $ `@metadata`  <df[,4]> <data.frame[26 x 4]>
-    $ event        <df[,4]> <data.frame[26 x 4]>
-    $ log          <df[,1]> <data.frame[26 x 1]>
-    $ message      <chr> "A token right was adjusted.\n\nSubject:\n\tSecurity I…
-    $ winlog       <df[,16]> <data.frame[26 x 16]>
-    $ ecs          <df[,1]> <data.frame[26 x 1]>
-    $ host         <df[,1]> <data.frame[26 x 1]>
-    $ agent        <df[,5]> <data.frame[26 x 5]>
-    $ time         <dttm> 2019-10-20 20:11:06, 2019-10-20 20:11:07, 2019-10-20 2…
+    Columns: 20
+    $ `@timestamp`         <chr> "2019-10-20T20:11:06.937Z", "2019-10-20T20:11:07.…
+    $ event_created        <chr> "2019-10-20T20:11:09.988Z", "2019-10-20T20:11:09.…
+    $ event_code           <int> 4703, 4673, 10, 10, 10, 10, 11, 10, 10, 10, 10, 7…
+    $ event_action         <chr> "Token Right Adjusted Events", "Sensitive Privile…
+    $ log_level            <chr> "information", "information", "information", "inf…
+    $ message              <chr> "A token right was adjusted.\n\nSubject:\n\tSecur…
+    $ winlog_event_id      <int> 4703, 4673, 10, 10, 10, 10, 11, 10, 10, 10, 10, 7…
+    $ winlog_provider_name <chr> "Microsoft-Windows-Security-Auditing", "Microsoft…
+    $ winlog_record_id     <int> 50588, 104875, 226649, 153525, 163488, 153526, 13…
+    $ winlog_computer_name <chr> "HR001.shire.com", "HFDC01.shire.com", "IT001.shi…
+    $ winlog_process       <df[,2]> <data.frame[26 x 2]>
+    $ winlog_keywords      <list<list>> ["Audit Success"], ["Audit Failure"], [<NULL>]…
+    $ winlog_provider_guid <chr> "{54849625-5478-4994-a5ba-3e3b0328c30d}", …
+    $ winlog_channel       <chr> "security", "Security", "Microsoft-Windows-Sysmon…
+    $ winlog_task          <chr> "Token Right Adjusted Events", "Sensitive Privile…
+    $ winlog_opcode        <chr> "Info", "Info", "Info", "Info", "Info", "Info", "…
+    $ winlog_version       <int> NA, NA, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, NA, 3…
+    $ winlog_user          <df[,4]> <data.frame[26 x 4]>
+    $ winlog_activity_id   <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+    $ event_ts             <dttm> 2019-10-20 20:11:06, 2019-10-20 20:11:07, 2019…
+
+## 3.Справочник Windows Event_ID
+
+1.  
 
 ``` r
-glimpse(event_ref)
-```
-
-    Rows: 381
-    Columns: 4
-    $ `Current Windows Event ID` <chr> "4618", "4649", "4719", "4765", "4766", "47…
-    $ `Legacy Windows Event ID`  <chr> "N/A", "N/A", "612", "N/A", "N/A", "N/A", "…
-    $ `Potential Criticality`    <chr> "High", "High", "High", "High", "High", "Hi…
-    $ `Event Summary`            <chr> "A monitored security event pattern has occ…
-
-### Анализ данных
-
-1.Разворачивание вложенных датафреймов:
-
-``` r
-nested_cols <- names(logs_prepared)[map_lgl(logs_prepared, is.data.frame)]
-
-for (cl in nested_cols) {
-logs_prepared <- unnest(logs_prepared, all_of(cl), names_sep = "_")
-}
-```
-
-2.Удаление колонок с единичными значениями:
-
-``` r
-drop_cols <- c()
-
-for (nm in names(logs_prepared)) {
-x <- logs_prepared[[nm]]
-if (!is.list(x) && !is.data.frame(x)) {
-uniq <- unique(na.omit(x[seq_len(min(1000, length(x)))]))
-if (length(uniq) <= 1) drop_cols <- c(drop_cols, nm)
-}
-}
-
-logs_prepared <- select(logs_prepared, -any_of(drop_cols))
-
-cat("Колонок удалено:", length(drop_cols), "\n")
-```
-
-    Колонок удалено: 13 
-
-``` r
-cat("Осталось колонок:", ncol(logs_prepared), "\n")
-```
-
-    Осталось колонок: 22 
-
-3.Подсчет количества уникальных хостов:
-
-``` r
-host_total <- logs_prepared %>%
-distinct(winlog_computer_name) %>%
-nrow()
-
-cat("Уникальных хостов:", host_total, "\n")
-```
-
-    Уникальных хостов: 5 
-
-4.Подготовка справочника Windows Event_ID:
-
-``` r
-events_clean <- event_ref %>%
+events_page <- read_html("https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor")
+events_table <- html_table(events_page, fill = TRUE)[[1]]
+events_dict <- events_table %>%
 rename(
-winlog_event_id = `Current Windows Event ID`,
-event_desc = `Event Summary`
+event_id = `Current Windows Event ID`,
+importance = `Potential Criticality`,
+description = `Event Summary`
 ) %>%
 mutate(
-winlog_event_id = as.integer(winlog_event_id),
-event_desc = as.character(event_desc)
+event_id = as.integer(event_id),
+importance = as.character(importance),
+description = as.character(description)
 )
 ```
 
     Warning: There was 1 warning in `mutate()`.
-    ℹ In argument: `winlog_event_id = as.integer(winlog_event_id)`.
+    ℹ In argument: `event_id = as.integer(event_id)`.
     Caused by warning:
     ! в результате преобразования созданы NA
 
 ``` r
-glimpse(events_clean)
+glimpse(events_dict)
 ```
 
     Rows: 381
     Columns: 4
-    $ winlog_event_id           <int> 4618, 4649, 4719, 4765, 4766, 4794, 4897, 49…
+    $ event_id                  <int> 4618, 4649, 4719, 4765, 4766, 4794, 4897, 49…
     $ `Legacy Windows Event ID` <chr> "N/A", "N/A", "612", "N/A", "N/A", "N/A", "8…
-    $ `Potential Criticality`   <chr> "High", "High", "High", "High", "High", "Hig…
-    $ event_desc                <chr> "A monitored security event pattern has occu…
+    $ importance                <chr> "High", "High", "High", "High", "High", "Hig…
+    $ description               <chr> "A monitored security event pattern has occu…
 
-5.Определение событий с высоким и средним уровнем важности:
+## 4.Анализ данных
 
-``` r
-sev_high <- logs_prepared %>% filter(log_level == "error")
-sev_mid <- logs_prepared %>% filter(log_level == "warning")
-
-cat("События высокого уровня:", nrow(sev_high), "\n")
-```
-
-    События высокого уровня: 4 
+1.Количество уникальных хостов
 
 ``` r
-cat("События среднего уровня:", nrow(sev_mid), "\n")
+host_count <- logs_flat %>% distinct(winlog_computer_name) %>% nrow()
+cat("Количество уникальных хостов:", host_count, "\n")
 ```
 
-    События среднего уровня: 222 
+    Количество уникальных хостов: 5 
+
+2.Объединение с описанием событий
 
 ``` r
-cat("Всего:", nrow(sev_high) + nrow(sev_mid), "\n")
+logs_annot <- logs_flat %>%
+left_join(events_dict, by = c("winlog_event_id" = "event_id"))
 ```
 
-    Всего: 226 
+3.Отбор событий по уровню важности
+
+``` r
+critical_events <- logs_annot %>% filter(importance == "High")
+medium_events <- logs_annot %>% filter(importance == "Medium")
+cat("События высокого уровня:", nrow(critical_events), "\n")
+```
+
+    События высокого уровня: 0 
+
+``` r
+cat("События среднего уровня:", nrow(medium_events), "\n")
+```
+
+    События среднего уровня: 0 
+
+``` r
+cat("Всего критичных и средних событий:", nrow(critical_events) + nrow(medium_events), "\n")
+```
+
+    Всего критичных и средних событий: 0 
 
 ## Результат
 

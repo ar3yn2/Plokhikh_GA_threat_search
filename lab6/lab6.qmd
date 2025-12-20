@@ -28,122 +28,119 @@ format:
 
 1. Подготовка данных для анализа 
 2. Анализ датасета
-3. Оформление отчета
 
 ## Шаги:
 
-### Подготовка данных
+## Подготовка данных
 
-1.Импортируйте данных
+1.Импорт данных
+
 ```{r}
 library(jsonlite)
-library(xml2)
-library(rvest)
 library(dplyr)
 library(tidyr)
 library(purrr)
-
-src_url <- "https://storage.yandexcloud.net/iamcth-data/dataset.tar.gz"
-tmp_tar <- "ad_logs.tar.gz"
-
-download.file(src_url, tmp_tar, mode = "wb", quiet = TRUE)
-
-tar_contents <- untar(tmp_tar, list = TRUE)
-json_path <- tar_contents[grep("\\.json$", tar_contents)]
-
-tmp_dir <- tempdir()
-untar(tmp_tar, files = json_path, exdir = tmp_dir)
-
-full_json <- file.path(tmp_dir, json_path)
-
-json_conn <- file(full_json, open = "r")
-logs_raw <- stream_in(json_conn)
-cat("Строк импортировано:", nrow(logs_raw), "\n")
-
-events_url <- "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor"
-html_doc <- read_html(events_url)
-event_ref <- html_table(html_doc, fill = TRUE)[[1]]
+library(rvest)
+library(xml2)
 ```
 
-2.Приведение данных к “аккуратной” форме:
+2.Скачать архив
+
 ```{r}
-logs_prepared <- logs_raw %>%
+archive_url <- "https://storage.yandexcloud.net/iamcth-data/dataset.tar.gz"
+archive_file <- "ad_logs_downloaded.tar.gz"
+download.file(archive_url, archive_file, mode = "wb")
+```
+
+3.Содержимое и извлечение JSON
+
+```{r}
+contents <- untar(archive_file, list = TRUE)
+json_file <- contents[grep("\\.json$", contents)]
+tmp_extract <- tempdir()
+untar(archive_file, files = json_file, exdir = tmp_extract)
+json_full <- file.path(tmp_extract, json_file)
+```
+
+4.Чтение JSON
+
+```{r}
+raw_logs <- stream_in(file(json_full))
+cat("Количество записей в исходных логах:", nrow(raw_logs), "\n")
+```
+
+## 2.Аккуратная форма:
+1.
+
+```{r}
+logs_clean <- raw_logs %>%
 mutate(
-time = as.POSIXct(`@timestamp`, format = "%Y-%m-%dT%H:%M:%OSZ"),
-across(where(is.character), ~ifelse(. == "", NA, .))
+event_ts = as.POSIXct(`@timestamp`, format="%Y-%m-%dT%H:%M:%OSZ"),
+across(where(is.character), ~na_if(., ""))
 )
-
-cat("Строк:", nrow(logs_prepared), "Колонок:", ncol(logs_prepared), "\n")
 ```
 
-3.Просмотрите общую структуру данных с помощью функции glimpse()
+2.Вложенные столбцы
+
 ```{r}
-glimpse(logs_prepared)
-glimpse(event_ref)
-```
-
-
-### Анализ данных
-
-1.Разворачивание вложенных датафреймов:
-```{r}
-nested_cols <- names(logs_prepared)[map_lgl(logs_prepared, is.data.frame)]
-
-for (cl in nested_cols) {
-logs_prepared <- unnest(logs_prepared, all_of(cl), names_sep = "_")
+nested_cols <- names(logs_clean)[map_lgl(logs_clean, is.data.frame)]
+logs_flat <- logs_clean
+for (col in nested_cols) {
+logs_flat <- unnest_wider(logs_flat, all_of(col), names_sep = "_")
 }
 ```
 
-2.Удаление колонок с единичными значениями:
+3.Убираем колонки с одним значением
+
 ```{r}
-drop_cols <- c()
-
-for (nm in names(logs_prepared)) {
-x <- logs_prepared[[nm]]
-if (!is.list(x) && !is.data.frame(x)) {
-uniq <- unique(na.omit(x[seq_len(min(1000, length(x)))]))
-if (length(uniq) <= 1) drop_cols <- c(drop_cols, nm)
-}
-}
-
-logs_prepared <- select(logs_prepared, -any_of(drop_cols))
-
-cat("Колонок удалено:", length(drop_cols), "\n")
-cat("Осталось колонок:", ncol(logs_prepared), "\n")
+logs_flat <- logs_flat %>% select(where(~ n_distinct(., na.rm = TRUE) > 1))
+glimpse(logs_flat)
 ```
 
-3.Подсчет количества уникальных хостов:
-```{r}
-host_total <- logs_prepared %>%
-distinct(winlog_computer_name) %>%
-nrow()
+## 3.Справочник Windows Event_ID
+1.
 
-cat("Уникальных хостов:", host_total, "\n")
-```
-
-4.Подготовка справочника Windows Event_ID:
 ```{r}
-events_clean <- event_ref %>%
+events_page <- read_html("https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor")
+events_table <- html_table(events_page, fill = TRUE)[[1]]
+events_dict <- events_table %>%
 rename(
-winlog_event_id = `Current Windows Event ID`,
-event_desc = `Event Summary`
+event_id = `Current Windows Event ID`,
+importance = `Potential Criticality`,
+description = `Event Summary`
 ) %>%
 mutate(
-winlog_event_id = as.integer(winlog_event_id),
-event_desc = as.character(event_desc)
+event_id = as.integer(event_id),
+importance = as.character(importance),
+description = as.character(description)
 )
-
-glimpse(events_clean)
+glimpse(events_dict)
 ```
 
-5.Определение событий с высоким и средним уровнем важности:
-```{r}
-sev_high <- logs_prepared %>% filter(log_level == "error")
-sev_mid <- logs_prepared %>% filter(log_level == "warning")
+## 4.Анализ данных
 
-cat("События высокого уровня:", nrow(sev_high), "\n")
-cat("События среднего уровня:", nrow(sev_mid), "\n")
-cat("Всего:", nrow(sev_high) + nrow(sev_mid), "\n")
+1.Количество уникальных хостов
+
+```{r}
+host_count <- logs_flat %>% distinct(winlog_computer_name) %>% nrow()
+cat("Количество уникальных хостов:", host_count, "\n")
+```
+
+2.Объединение с описанием событий
+
+```{r}
+logs_annot <- logs_flat %>%
+left_join(events_dict, by = c("winlog_event_id" = "event_id"))
+```
+
+3.Отбор событий по уровню важности
+
+```{r}
+critical_events <- logs_annot %>% filter(importance == "High")
+medium_events <- logs_annot %>% filter(importance == "Medium")
+cat("События высокого уровня:", nrow(critical_events), "\n")
+cat("События среднего уровня:", nrow(medium_events), "\n")
+cat("Всего критичных и средних событий:", nrow(critical_events) + nrow(medium_events), "\n")
 ```
 
 ## Результат
