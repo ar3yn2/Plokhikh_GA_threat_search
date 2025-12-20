@@ -1,5 +1,5 @@
 ---
-title: "Использование технологии Yandex DataLens для анализа данных сетевой активности"
+title: "8 Пр"
 author: "gleb.plokhikh@yandex.ru"
 format: 
   md:
