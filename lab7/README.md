@@ -1,5 +1,4 @@
-# Использование технологии Yandex Query для анализа данных сетевой
-активности
+# 7 Практика
 gleb.plokhikh@yandex.ru
 
 ## Цель работы
@@ -15,9 +14,6 @@ gleb.plokhikh@yandex.ru
 
 1.  Программное обеспечение Windows 11
 2.  Rstudio Desktop
-3.  Данные сетевой активности в корпоративной сети компании XYZ,
-    хранящиеся в `Yandex Object Storage`
-4.  Сервисы `Yandex Cloud`
 
 ## Задание
 
@@ -38,48 +34,17 @@ gleb.plokhikh@yandex.ru
 
 ## Шаги
 
-### 1. Проверить доступность данных в Yandex Object Storage
-
-Перейдем по ссылке до бакета, чтобы убедиться в доступности данных:
-https://storage.yandexcloud.net/arrow-datasets.
-
-![](img/1.png)
-
-### 2. Подключить бакет как источник данных для Yandex Query
-
-#### 2.1-2.2 Создать соединение для бакета в S3 хранилище и заполнить поля с учетом допустимых символов
+### 1. СОздать бакет как источник данных для Yandex Query
 
 ![](img/2.png)
 
-#### 2.3-2.4 Создать привязку данных и настроить ее
+### 2. Создать привязку данных и настроить ее
 
 ![](img/3.png)
 
-Учитывая представленную схему настроим формат данных:
-
-    SCHEMA=(
-    timestamp TIMESTAMP NOT NULL,
-    src STRING,
-    dst STRING,
-    port INT32,
-    bytes INT32
-    )
-
 ![](img/4.png)
 
-#### 2.5 Проверка правильности подключения
-
-Выполним простой запрос:
-
-``` sql
-SELECT
-   *
-FROM
-   `arrow_bind_plokhikh`
-LIMIT 100;
-```
-
-Получим следующие результаты:
+#### 2.5 Проверка правильности подключения данных
 
 ![](img/5.png)
 
@@ -92,32 +57,11 @@ LIMIT 100;
 с разделителем `.`, применим функцию к `dst` и к `src` и выберем
 количество уникальных адресов.
 
-``` sql
-SELECT COUNT(DISTINCT ip_addr) as hosts_amount
-FROM
-    (SELECT dst as ip_addr
-    FROM `arrow_bind_plokhikh`
-    WHERE CAST(String::SplitToList(dst, '.')[0] AS Int32) BETWEEN 12 AND 14
-    UNION
-    SELECT src as ip_addr
-    FROM `arrow_bind_plokhikh`
-    WHERE CAST(String::SplitToList(src, '.')[0] AS Int32) BETWEEN 12 AND 14)
-```
-
 ![](img/6.png)
 
 Видим, что количество хостов в датасете - 1000.
 
 #### 3.2. Определите суммарный объем исходящего трафика
-
-``` sql
-SELECT SUM(bytes)
-FROM 
-   `arrow_bind_kolomytsev`
-WHERE (SUBSTRING(src, 0, 3) = "12." OR SUBSTRING(src, 0, 3) = "13." OR SUBSTRING(src, 0, 3) = "14.")
-        AND
-       (SUBSTRING(dst, 0, 3) != "12." AND SUBSTRING(dst, 0, 3) != "13." AND SUBSTRING(dst, 0, 3) != "14.");
-```
 
 ![](img/7.png)
 
@@ -125,15 +69,6 @@ WHERE (SUBSTRING(src, 0, 3) = "12." OR SUBSTRING(src, 0, 3) = "13." OR SUBSTRING
 
 Обратная задача, нам необходимо поменять `dst` и `src` местами в
 запросе:
-
-``` sql
-SELECT SUM(bytes)
-FROM 
-   `arrow_bind_plokhikh`
-WHERE (SUBSTRING(dst, 0, 3) = "12." OR SUBSTRING(dst, 0, 3) = "13." OR SUBSTRING(dst, 0, 3) = "14.")
-        AND
-       (SUBSTRING(src, 0, 3) != "12." AND SUBSTRING(src, 0, 3) != "13." AND SUBSTRING(src, 0, 3) != "14.");
-```
 
 ![](img/8.png)
 
