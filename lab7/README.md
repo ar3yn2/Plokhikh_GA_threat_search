@@ -75,7 +75,7 @@ https://storage.yandexcloud.net/arrow-datasets.
 SELECT
    *
 FROM
-   `arrow_bind_kolomytsev`
+   `arrow_bind_plokhikh`
 LIMIT 100;
 ```
 
@@ -96,11 +96,11 @@ LIMIT 100;
 SELECT COUNT(DISTINCT ip_addr) as hosts_amount
 FROM
     (SELECT dst as ip_addr
-    FROM `arrow_bind_kolomytsev`
+    FROM `arrow_bind_plokhikh`
     WHERE CAST(String::SplitToList(dst, '.')[0] AS Int32) BETWEEN 12 AND 14
     UNION
     SELECT src as ip_addr
-    FROM `arrow_bind_kolomytsev`
+    FROM `arrow_bind_plokhikh`
     WHERE CAST(String::SplitToList(src, '.')[0] AS Int32) BETWEEN 12 AND 14)
 ```
 
