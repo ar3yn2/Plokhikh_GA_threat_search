@@ -94,20 +94,6 @@ rcode = as.numeric(rcode)
 )
 ```
 
-4\. Участники информационного обмена
-
-```{r}
-all_ips <- unique(c(dns_tbl_clean$src_ip, dns_tbl_clean$dst_ip))
-total_participants <- length(all_ips)
-internal_ips <- all_ips[
-  grepl("^(10\\.|192\\.168\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.)", all_ips)
-]
-external_ips <- setdiff(all_ips, internal_ips)
-ratio_internal_external <- length(internal_ips) / length(external_ips)
-external_ips <- setdiff(all_ips, internal_ips)
-ratio_internal_external <- length(internal_ips)/length(external_ips)
-```
-
 5\. Топ-10 активных участников и доменов
 
 ```{r}
